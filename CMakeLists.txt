@@ -27,10 +27,7 @@ endif()
 
 target_compile_options(nativecord-lib PRIVATE /W4 /WX)
 target_include_directories(nativecord-lib PUBLIC "src/lib")
-target_link_libraries(nativecord-lib PRIVATE 
-    nlohmann_json
-    websockets
-    ${LIBWEBSOCKETS_DEP_LIBS})
+target_link_libraries(nativecord-lib PRIVATE nlohmann_json websockets ${LIBWEBSOCKETS_DEP_LIBS})
 set_target_properties(nativecord-lib PROPERTIES USE_FOLDERS ON)
 
 # ---------------------
@@ -40,7 +37,7 @@ if (NATIVECORD_LIB_TEST)
     file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS "src/test/*.cpp" "src/test/*.h")
     add_executable(nativecord-test ${TEST_SOURCES})
     target_compile_options(nativecord-test PRIVATE /W4 /WX)
-    target_link_libraries(nativecord-test PUBLIC nativecord-lib)
+    target_link_libraries(nativecord-test PUBLIC nativecord-lib nlohmann_json)
     set_target_properties(nativecord-test PROPERTIES USE_FOLDERS ON)
 
     if (MSVC)
