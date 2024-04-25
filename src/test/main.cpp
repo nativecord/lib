@@ -27,10 +27,10 @@ int main(int /*argc*/, char* argv[])
 
     std::string token = configjs["token"].get<std::string>();
 
-    auto client = new nativecord::Client();
-    client->setToken(token);
-    client->setIntents(INTENT_GUILDS | INTENT_GUILD_MESSAGES | INTENT_GUILD_MEMBERS);
-    ASSERT(client->connect(), "client failed to connect");
+    nativecord::Client client;
+    client.setToken(token);
+    client.setIntents(INTENT_GUILDS | INTENT_GUILD_MESSAGES | INTENT_GUILD_MEMBERS);
+    ASSERT(client.connect(), "client failed to connect");
 
     nativecord::websockets::pollEvents();
 
