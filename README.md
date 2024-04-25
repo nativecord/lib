@@ -20,6 +20,10 @@
 - Cross-platform compatibility
 - Minimalist design for easy integration into existing projects.
 
+## Associated projects
+* [client](https://github.com/nativecord/client "client") - A Discord client powered by this library.
+* [imcord](https://github.com/nativecord/client "imcord") - An example UI implementation used by the client.
+
 ## Requirements
 * CMake 3.29.2
 * OpenSSL
