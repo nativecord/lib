@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD 20)
 # ---------------------
 # project
 # ---------------------
-project(nativecord-lib LANUGAGES CXX)
+project(nativecord-lib LANGUAGES CXX)
 add_subdirectory(vendor) # vencord reference????
 
 file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS "src/lib/*.cpp" "src/lib/*.h")
