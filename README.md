@@ -4,14 +4,14 @@
 </h1>
 <p align="center">
 	A minimalist cross-platform C++ library designed to facilitate interaction with Discord.
-	Made with bots, applications and clients in mind.
 	<br/>
+	Made with bots, applications and clients in mind.
+	<br/> <br/>
 	<a href="https://discord.gg/uEvGbYZT9xt"><b>Join our server</b></a>
 </p>
 
 > [!WARNING]  
-> Early Development Stage \
-> This project is currently in its early development stage. As such, breaking changes may occur frequently without prior notice. We are actively working on improving and refining the library, so please be prepared to adapt your code accordingly. \
+> This project is currently in its **early development stage**. As such, breaking changes may occur frequently without prior notice. We are actively working on improving and refining the library, so please be prepared to adapt your code accordingly. \
 > \
 > Your feedback and contributions are highly appreciated as we work towards stabilizing the project. Thank you for your understanding and patience.
 
