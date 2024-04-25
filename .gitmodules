@@ -1,0 +1,6 @@
+[submodule "vendor/json"]
+	path = vendor/json
+	url = https://github.com/nlohmann/json
+[submodule "vendor/libwebsockets"]
+	path = vendor/libwebsockets
+	url = https://github.com/warmcat/libwebsockets/
