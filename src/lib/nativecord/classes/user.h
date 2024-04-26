@@ -5,6 +5,17 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
+enum userStatus
+{
+    STATUS_ONLINE,
+    STATUS_DND,
+    STATUS_IDLE,
+    STATUS_INVISIBLE,
+    STATUS_OFFLINE
+};
+
+static const char* userStatusChar[] = {"online", "dnd", "idle", "invisible", "offline"};
+
 enum userFlags : int64_t
 {
     FLAG_STAFF = 1 << 0,
