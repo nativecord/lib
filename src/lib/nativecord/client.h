@@ -9,6 +9,7 @@
 #include "objects/activity.h"
 
 #include <string>
+#include <vector>
 #include <unordered_map>
 
 /*
@@ -49,7 +50,7 @@ namespace nativecord
 
             NC_EXPORT inline const User* getUser() const;
 
-            NC_EXPORT void setPersona(userStatus status, Activity activities[2] = nullptr);
+            NC_EXPORT void setPersona(userStatus status, std::vector<Activity>* activities = {});
 
             NC_EXPORT bool connect();
 

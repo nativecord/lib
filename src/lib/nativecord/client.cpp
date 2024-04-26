@@ -1,8 +1,8 @@
 #include "client.h"
 #include "endpoints.h"
 
-#include "util/assert.h"
 #include "objects/message.h"
+#include "util/assert.h"
 
 #include <libwebsockets.h>
 
@@ -217,15 +217,22 @@ NC_EXPORT inline const User* nativecord::Client::getUser() const
 }
 
 // TO-DO: add activities
-NC_EXPORT void nativecord::Client::setPersona(userStatus status, Activity /*activities*/[2])
+NC_EXPORT void nativecord::Client::setPersona(userStatus status, std::vector<Activity>* activities)
 {
     ASSERT(_wsInterface, "called setPersona from outside an event");
-
-    nlohmann::json activitiesJS = nlohmann::json::array();
     nlohmann::json payload;
     payload["op"] = GATEWAY_PRESENCE_UPDATE;
-    payload["d"] = {
-        {"status", userStatusChar[status]}, {"afk", false}, {"activities", activitiesJS}, {"since", nullptr}};
+    payload["d"] = {{"status", status},
+                    {"afk", false},
+                    {"activities", nlohmann::json::array({})},
+                    {"since", nullptr}};
+
+    if (activities)
+    {
+        ASSERT(activities->size() < 2, "can't have more than two activities at once");
+        payload["d"]["activities"] = *activities;
+    }
+
     sendJSON(_wsInterface, &payload);
 }
 
