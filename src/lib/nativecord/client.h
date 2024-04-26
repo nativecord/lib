@@ -35,7 +35,7 @@ namespace nativecord
     class Client
     {
         public:
-            NC_EXPORT inline Client(std::string token = "");
+            NC_EXPORT Client(std::string token = "");
 
             NC_EXPORT inline void setToken(std::string token)
             {
