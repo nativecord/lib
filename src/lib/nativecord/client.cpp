@@ -82,6 +82,8 @@ int nativecord::Client::handleWss(lws* wsi, lws_callback_reasons reason, char* i
             }
         case LWS_CALLBACK_WS_PEER_INITIATED_CLOSE:
             nativecord::websockets::g_connections--;
+            if (nativecord::websockets::g_connections < 1)
+                nativecord::websockets::g_shouldStop = true;
             return -1;
     }
     return 0;
