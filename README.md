@@ -41,6 +41,11 @@ void yourFunction() {
 	client.setIntents(INTENT_GUILDS | INTENT_GUILD_MESSAGES | INTENT_GUILD_MEMBERS);
 	client.connect();
 	
+	client._emitter.on<nativecord::Client*>("ready", [](nativecord::Client* client) {
+		Log::Info("Client is ready");
+ 		Log::Info("Logged in as {} | {}", client->getUser()->username, client->getUser()->id);
+	});
+
 	/*
 		this will yield the current thread untill all clients are disconnected
 	*/
