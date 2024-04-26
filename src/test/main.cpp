@@ -5,8 +5,8 @@
 
 #include "util/log.h"
 
-#include <fstream>
 #include <filesystem>
+#include <fstream>
 
 int main(int /*argc*/, char* argv[])
 {
@@ -16,7 +16,7 @@ int main(int /*argc*/, char* argv[])
 
     Log::Info("Parsing config file");
     std::filesystem::path binPath = std::filesystem::absolute(std::filesystem::path(argv[0])).parent_path();
-    std::string configPath(binPath.string() +  "\\config.json");
+    std::string configPath(binPath.string() + "\\config.json");
 
     ASSERT(std::filesystem::exists(configPath), "config.json does not exist.");
     std::ifstream config(configPath);
@@ -31,6 +31,11 @@ int main(int /*argc*/, char* argv[])
     client.setToken(token);
     client.setIntents(INTENT_GUILDS | INTENT_GUILD_MESSAGES | INTENT_GUILD_MEMBERS);
     ASSERT(client.connect(), "client failed to connect");
+
+    client._emitter.on<nativecord::Client*>("ready", [](nativecord::Client* client) {
+        Log::Info("Client is ready");
+        Log::Info("Logged in as {} | {}", client->getUser()->getUsername(), client->getUser()->getId());
+    });
 
     nativecord::websockets::pollEvents();
 
