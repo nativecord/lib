@@ -2,7 +2,7 @@
 
 #include <nativecord/util/assert.h>
 
-#include <nativecord/classes/message.h>
+#include <nativecord/objects/message.h>
 
 #include <nlohmann/json.hpp>
 
@@ -10,6 +10,8 @@
 
 #include <filesystem>
 #include <fstream>
+
+#include <chrono>
 
 int main(int /*argc*/, char* argv[])
 {
@@ -38,7 +40,18 @@ int main(int /*argc*/, char* argv[])
     client._emitter.on<nativecord::Client*>("ready", [](nativecord::Client* client) {
         Log::Info("Client is ready");
         Log::Info("Logged in as {} | {}", client->getUser()->username, client->getUser()->id);
-        client->setPersona(STATUS_ONLINE);
+
+        auto now = std::chrono::system_clock::now().time_since_epoch();
+
+        Activity testActivity;
+        testActivity.type = ACTIVITY_WATCHING;
+        testActivity.name = "how discord ratelimits me";
+        testActivity.timestamps.start =
+            static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(now).count());
+        std::vector<Activity> activities;
+        activities.push_back(testActivity);
+
+        client->setPersona(STATUS_IDLE, &activities);
     });
 
     client._emitter.on<nativecord::Client*, lws*, void*>("dispatch", [](nativecord::Client* client, lws*, void* jsPtr) {
@@ -48,8 +61,7 @@ int main(int /*argc*/, char* argv[])
     });
 
     client._emitter.on<nativecord::Client*, Message*>("message", [](nativecord::Client* /*client*/, Message* msg) {
-        Log::Verbose("Client received message from {} : {}", msg->author.global_name,
-                     msg->content);
+        Log::Verbose("Client received message from {} : {}", msg->author.global_name, msg->content);
     });
 
     client._emitter.on<uint16_t>("disconnect",
