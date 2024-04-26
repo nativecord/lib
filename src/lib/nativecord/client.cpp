@@ -10,6 +10,17 @@
 static lws_protocols protocols[] = {{"wss", nativecord::Client::wssCallback, 0, NC_MAX_WSS_PACKETSIZE}, {0, 0}};
 static lws_extension extensions[] = {{0, 0, 0}};
 
+    /*
+        ready event
+    */
+    _emitter.registerEvent<Client*>("ready");
+    _dispatchListeners["READY"] = [](Client* client, lws* /*wsi*/, void* jsPtr) {
+        nlohmann::json* js = reinterpret_cast<nlohmann::json*>(jsPtr);
+        js->at("d")["user"].get_to(client->_localUser);
+        client->_emitter.fireEvent("ready", client);
+    };
+}
+
 NC_EXPORT bool nativecord::Client::connect()
 {
     ASSERT(!_token.empty(), "invalid token (empty)");
@@ -87,8 +98,12 @@ void nativecord::Client::handleGateway(lws* wsi, char* in)
     switch (code)
     {
         case GATEWAY_DISPATCH:
-            handleDispatch(wsi, payload.at("t").get<std::string>(), &payload);
-            break;
+            {
+                std::string eventName = payload.at("t").get<std::string>();
+                if (_dispatchListeners.contains(eventName))
+                    _dispatchListeners[eventName](this, wsi, &payload);
+                break;
+            }
         case GATEWAY_INVALID_SESSION:
             PANIC("received GATEWAY_INVALID_SESSION");
             break;
@@ -117,11 +132,6 @@ void nativecord::Client::handleGateway(lws* wsi, char* in)
                 break;
             }
     }
-}
-
-void nativecord::Client::handleDispatch(lws* wsi, std::string eventName, void* dataPtr)
-{
-    wsi, eventName, dataPtr;
 }
 
 void nativecord::Client::sendJSON(lws* wsi, void* jsPtr) const

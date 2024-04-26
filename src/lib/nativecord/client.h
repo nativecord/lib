@@ -60,6 +60,8 @@ namespace nativecord
             void handleDispatch(lws* wsi, std::string eventName, void* dataPtr);
             void sendJSON(lws* wsi, void* jsPtr) const;
 
+            std::unordered_map<std::string, void (*)(Client* client, lws* wsi, void* jsPtr)> _dispatchListeners;
+
             std::string _token;
 
             int _heartbeatInterval = -1;
