@@ -2,6 +2,7 @@
 #include "endpoints.h"
 
 #include "util/assert.h"
+#include "classes/message.h"
 
 #include <libwebsockets.h>
 
@@ -20,6 +21,16 @@ inline nativecord::Client::Client(std::string token) : _token(token)
         nlohmann::json* js = reinterpret_cast<nlohmann::json*>(jsPtr);
         js->at("d")["user"].get_to(client->_localUser);
         client->_emitter.fireEvent("ready", std::forward<Client*>(client));
+    };
+
+    /*
+        message event
+    */
+    _emitter.registerEvent<Client*, Message*>("message");
+    _dispatchListeners["MESSAGE_CREATE"] = [](Client* client, lws*, void* jsPtr) {
+        nlohmann::json* js = reinterpret_cast<nlohmann::json*>(jsPtr);
+        Message msg = js->at("d").get<Message>();
+        client->_emitter.fireEvent("message", std::forward<Client*>(client), &msg);
     };
 
     /*
