@@ -55,29 +55,26 @@
 #define NC_SERIALIZE_CLEANUP(js)                                                                                       \
     for (auto it = js.begin(); it != js.end();)                                                                        \
     {                                                                                                                  \
-        if (it.value().is_string())                                                                                    \
+        if (it.value().is_string() && it.value().get<std::string>().empty())                                           \
         {                                                                                                              \
-            if (it.value().get<std::string>().empty())                                                                 \
-                it = js.erase(it);                                                                                     \
+            it = js.erase(it);                                                                                         \
             continue;                                                                                                  \
         }                                                                                                              \
-        if (it.value().is_object())                                                                                    \
+        if (it.value().is_object() && it.value().empty())                                                              \
         {                                                                                                              \
-            if (it.value().empty())                                                                                    \
-                it = js.erase(it);                                                                                     \
+            it = js.erase(it);                                                                                         \
             continue;                                                                                                  \
         }                                                                                                              \
-        if (it.value().is_number_integer())                                                                            \
+        if (it.value().is_number_integer() && it.value().get<int>() < 0)                                               \
         {                                                                                                              \
-            if (it.value().get<int>() < 0)                                                                             \
-                it = js.erase(it);                                                                                     \
+            it = js.erase(it);                                                                                         \
             continue;                                                                                                  \
         }                                                                                                              \
         ++it;                                                                                                          \
     }
 
 #define _NC_DESERIALIZE(key, val, obj, js)                                                                             \
-    if (js.contains(key) && !js _ADD_BRACKETS(key).is_null())                                                    \
+    if (js.contains(key) && !js _ADD_BRACKETS(key).is_null())                                                          \
         js _ADD_BRACKETS(key).get_to(obj.##val);
 
 #define NC_DESERIALIZE(key)                                                                                            \
