@@ -1,5 +1,5 @@
 <h1 align="center">
-	<!--- (url)<img src="resources/icon.png" alt="icon" width="128" height="128"><br/> --->
+	<img src="resources/templogo.png" alt="icon" width="128" height="128"><br/>
     <b>nativecord (lib)</b>
 </h1>
 <p align="center">
