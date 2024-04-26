@@ -1,5 +1,8 @@
 #include <nativecord/client.h>
+
 #include <nativecord/util/assert.h>
+
+#include <nativecord/classes/message.h>
 
 #include <nlohmann/json.hpp>
 
@@ -42,6 +45,11 @@ int main(int /*argc*/, char* argv[])
         auto& js = *reinterpret_cast<nlohmann::json*>(jsPtr);
         std::string type = js["t"].get<std::string>();
         Log::Verbose("{} received dispatch of type: {}", client->getUser()->username, type);
+    });
+
+    client._emitter.on<nativecord::Client*, Message*>("message", [](nativecord::Client* /*client*/, Message* msg) {
+        Log::Verbose("Client received message from {} : {}", msg->author.global_name,
+                     msg->content);
     });
 
     client._emitter.on<uint16_t>("disconnect",
