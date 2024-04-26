@@ -2,9 +2,12 @@
 
 #include "gateway.h"
 #include "util/macros.h"
+#include "util/events.h"
+
 #include "classes/user.h"
 
 #include <string>
+#include <unordered_map>
 
 /*
     TO-DO:
@@ -60,6 +63,8 @@ namespace nativecord
 
             int handleWss(lws* wsi, lws_callback_reasons reason, char* in, size_t len);
             static int wssCallback(lws* wsi, lws_callback_reasons reason, void* user, void* in, size_t len);
+
+            EventEmitter _emitter;
 
         private:
             void handleGateway(lws* wsi, char* in);
