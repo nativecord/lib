@@ -64,7 +64,9 @@ int nativecord::Client::handleWss(lws* wsi, lws_callback_reasons reason, char* i
     switch (reason)
     {
         case LWS_CALLBACK_CLIENT_RECEIVE:
+            _wsInterface = wsi;
             this->handleGateway(wsi, in);
+            _wsInterface = nullptr;
             break;
         case LWS_CALLBACK_TIMER:
             lws_callback_on_writable(wsi);

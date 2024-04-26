@@ -56,6 +56,8 @@ namespace nativecord
             EventEmitter _emitter;
 
         private:
+            lws* _wsInterface = nullptr;
+
             void handleGateway(lws* wsi, char* in);
             void sendJSON(lws* wsi, void* jsPtr) const;
 
