@@ -22,6 +22,10 @@ inline nativecord::Client::Client(std::string token) : _token(token)
         client->_emitter.fireEvent("ready", std::forward<Client*>(client));
     };
 
+    /*
+        disconnect event
+    */
+    _emitter.registerEvent<uint16_t>("disconnect");
     _emitter.registerEvent<Client*, lws*, void*>("dispatch");
 }
 
