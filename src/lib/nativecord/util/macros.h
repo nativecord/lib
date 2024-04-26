@@ -34,6 +34,12 @@
 #define STR(x) STR_HELPER(x)
 
 /*
+    clang error fixes
+*/
+// under some circumstances [#a] makes clang detect the header as objective-c, so this macro does it somewhere else
+#define _ADD_BRACKETS(a) [a]
+
+/*
     json macros
 
     TO-DO:
