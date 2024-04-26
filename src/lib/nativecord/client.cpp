@@ -205,6 +205,25 @@ NC_EXPORT inline const User* nativecord::Client::getUser() const
     return &_localUser;
 }
 
+// TO-DO: add activities
+NC_EXPORT void nativecord::Client::setPersona(userStatus status, Activity /*activities*/[2])
+{
+    ASSERT(_wsInterface, "called setPersona from outside an event");
+
+    nlohmann::json activitiesJS = nlohmann::json::array();
+    nlohmann::json payload;
+    payload["op"] = GATEWAY_PRESENCE_UPDATE;
+    payload["d"] = {
+        {"status", userStatusChar[status]}, {"afk", false}, {"activities", activitiesJS}, {"since", nullptr}};
+    sendJSON(_wsInterface, &payload);
+}
+
+/*
+    base connection implementation
+*/
+static lws_protocols protocols[] = {{"wss", nativecord::Client::wssCallback, 0, NC_MAX_WSS_PACKETSIZE}, {0, 0}};
+static lws_extension extensions[] = {{0, 0, 0}};
+
 void nativecord::websockets::createContext()
 {
     ASSERT(g_context == nullptr, "attempted to create context while g_context != nullptr");

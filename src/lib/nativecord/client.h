@@ -6,6 +6,7 @@
 #include "util/macros.h"
 
 #include "classes/user.h"
+#include "classes/activity.h"
 
 #include <string>
 #include <unordered_map>
@@ -47,6 +48,8 @@ namespace nativecord
             NC_EXPORT inline int getIntents() const;
 
             NC_EXPORT inline const User* getUser() const;
+
+            NC_EXPORT void setPersona(userStatus status, Activity activities[2] = nullptr);
 
             NC_EXPORT bool connect();
 
