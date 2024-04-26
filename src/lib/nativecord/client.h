@@ -2,6 +2,7 @@
 
 #include "gateway.h"
 #include "util/macros.h"
+#include "classes/user.h"
 
 #include <string>
 
@@ -50,6 +51,11 @@ namespace nativecord
                 return _intents;
             };
 
+            NC_EXPORT const User* getUser()
+            {
+                return &_localUser;
+            }
+
             NC_EXPORT bool connect();
 
             int handleWss(lws* wsi, lws_callback_reasons reason, char* in, size_t len);
@@ -67,5 +73,7 @@ namespace nativecord
             int _heartbeatInterval = -1;
             int _lastSeq = -1;
             int _intents = -1;
+
+            User _localUser;
     };
 }
