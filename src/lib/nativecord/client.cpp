@@ -163,6 +163,33 @@ int nativecord::Client::wssCallback(lws* wsi, lws_callback_reasons reason, void*
     return client->handleWss(wsi, reason, reinterpret_cast<char*>(in), len);
 }
 
+/*
+    client setters / getters
+*/
+NC_EXPORT inline void nativecord::Client::setToken(std::string token)
+{
+    _token = token;
+}
+
+NC_EXPORT inline std::string nativecord::Client::getToken() const
+{
+    return _token;
+}
+
+NC_EXPORT inline void nativecord::Client::setIntents(int intents)
+{
+    _intents = intents;
+};
+NC_EXPORT inline int nativecord::Client::getIntents() const
+{
+    return _intents;
+};
+
+NC_EXPORT inline const User* nativecord::Client::getUser() const
+{
+    return &_localUser;
+}
+
 void nativecord::websockets::createContext()
 {
     ASSERT(g_context == nullptr, "attempted to create context while g_context != nullptr");

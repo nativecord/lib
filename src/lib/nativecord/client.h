@@ -40,28 +40,13 @@ namespace nativecord
         public:
             NC_EXPORT Client(std::string token = "");
 
-            NC_EXPORT inline void setToken(std::string token)
-            {
-                _token = token;
-            }
-            NC_EXPORT inline std::string getToken() const
-            {
-                return _token;
-            };
+            NC_EXPORT inline void setToken(std::string token);
+            NC_EXPORT inline std::string getToken() const;
 
-            NC_EXPORT inline void setIntents(int intents)
-            {
-                _intents = intents;
-            };
-            NC_EXPORT inline int getIntents() const
-            {
-                return _intents;
-            };
+            NC_EXPORT inline void setIntents(int intents);
+            NC_EXPORT inline int getIntents() const;
 
-            NC_EXPORT const User* getUser()
-            {
-                return &_localUser;
-            }
+            NC_EXPORT inline const User* getUser() const;
 
             NC_EXPORT bool connect();
 
