@@ -32,3 +32,24 @@
 */
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
+
+/*
+    json macros
+*/
+#define NC_SERIALIZE(key, val) js[key] = obj._##val
+#define NC_SERIALIZE_OPT_STR(key, val)                                                                                 \
+    if (!obj._##val.empty())                                                                                           \
+        js[key] = obj._##val;
+#define NC_SERIALIZE_OPT_NUM(key, val)                                                                                 \
+    if (obj._##val != -1)                                                                                              \
+        js[key] = obj._##val;
+#define NC_SERIALIZE_OPT(key, val)                                                                                     \
+    if (obj._##val)                                                                                                    \
+        js[key] = obj._##val;
+
+#define NC_DESERIALIZE(key, val)                                                                                       \
+    if (js.contains(key) && !js[key].is_null())                                                                        \
+        js.at(key).get_to(obj._##val);
+#define NC_DESERIALIZE_UINT64(key, val)                                                                                \
+    if (js.contains(key) && !js[key].is_null())                                                                        \
+        obj._##val = std::stoull(js[key].get<std::string>());
