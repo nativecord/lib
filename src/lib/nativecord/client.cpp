@@ -105,7 +105,7 @@ void nativecord::Client::handleGateway(lws* wsi, char* in)
     {
         case GATEWAY_DISPATCH:
             {
-                _emitter.fireEvent("dispatch", this, wsi, &payload);
+                _emitter.fireEvent("dispatch", this, wsi, reinterpret_cast<void*>(&payload));
                 std::string eventName = payload.at("t").get<std::string>();
                 if (_dispatchListeners.contains(eventName))
                     _dispatchListeners[eventName](this, wsi, &payload);
