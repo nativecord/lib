@@ -140,9 +140,6 @@ void nativecord::Client::handleGateway(lws* wsi, char* in)
 
 void nativecord::Client::sendJSON(lws* wsi, void* jsPtr) const
 {
-    nlohmann::json* js = reinterpret_cast<nlohmann::json*>(jsPtr);
-    if (_lastSeq && js->at("op") != GATEWAY_HEARTBEAT && _lastSeq != -1)
-        js->at("s") = _lastSeq;
 
     std::string payloadStr = js->dump();
     unsigned char* buff = reinterpret_cast<unsigned char*>(malloc(LWS_PRE + payloadStr.size()));
