@@ -83,10 +83,17 @@ int nativecord::Client::handleWss(lws* wsi, lws_callback_reasons reason, char* i
                 break;
             }
         case LWS_CALLBACK_WS_PEER_INITIATED_CLOSE:
-            nativecord::websockets::g_connections--;
-            if (nativecord::websockets::g_connections < 1)
-                nativecord::websockets::g_shouldStop = true;
-            return -1;
+            {
+                uint16_t code;
+                memcpy(&code, in, sizeof(uint16_t));
+                code = ntohs(code);
+                _emitter.fireEvent("disconnect", std::forward<uint16_t>(code));
+
+                nativecord::websockets::g_connections--;
+                if (nativecord::websockets::g_connections < 1)
+                    nativecord::websockets::g_shouldStop = true;
+                return -1;
+            }
     }
     return 0;
 }
