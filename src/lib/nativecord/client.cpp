@@ -21,6 +21,8 @@ inline nativecord::Client::Client(std::string token) : _token(token)
         js->at("d")["user"].get_to(client->_localUser);
         client->_emitter.fireEvent("ready", client);
     };
+
+    _emitter.registerEvent<Client*, lws*, void*>("dispatch");
 }
 
 NC_EXPORT bool nativecord::Client::connect()
@@ -103,6 +105,7 @@ void nativecord::Client::handleGateway(lws* wsi, char* in)
     {
         case GATEWAY_DISPATCH:
             {
+                _emitter.fireEvent("dispatch", this, wsi, &payload);
                 std::string eventName = payload.at("t").get<std::string>();
                 if (_dispatchListeners.contains(eventName))
                     _dispatchListeners[eventName](this, wsi, &payload);
