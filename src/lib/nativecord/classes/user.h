@@ -43,114 +43,37 @@ enum userFlags : int64_t
     FLAG_ACTIVE_DEVELOPER = 1 << 22,
 };
 
-class User
+struct User
 {
-    private:
+    public:
         /*
             base info
         */
-        uint64_t _id;
-        std::string _username;
+        uint64_t id = 0;
+        std::string username;
         // std::string _discriminator;
-        std::string _globalName;
-        bool _isBot;
-        bool _isSystem;
-        int _premiumType = -1;
-        userFlags _publicFlags = static_cast<userFlags>(-1);
+        std::string global_name;
+        bool bot;
+        bool system;
+        int premium_type = -1;
+        userFlags public_flags = static_cast<userFlags>(-1);
 
         /*
             appearance
         */
-        std::string _avatar;
-        std::string _avatarDecoration;
-        std::string _banner;
-        int _accentCol = -1;
+        std::string avatar;
+        std::string avatar_decoration;
+        std::string banner;
+        int accent_color = -1;
 
         /*
             private info (only for local user)
         */
-        userFlags _flags;
-        bool _mfaEnabled;
-        bool _verified;
-        std::string _email;
-        std::string _locale;
-
-    public:
-        // Getter functions for base info
-        inline uint64_t getId() const
-        {
-            return _id;
-        }
-
-        inline std::string getUsername() const
-        {
-            return _username;
-        }
-        // inline std::string getDiscriminator() const
-        //{
-        //     return _discriminator;
-        // }
-        inline std::string getGlobalName() const
-        {
-            return _globalName;
-        }
-        inline bool isBot() const
-        {
-            return _isBot;
-        }
-        inline bool isSystem() const
-        {
-            return _isSystem;
-        }
-        inline int getPremiumType() const
-        {
-            return _premiumType;
-        }
-        inline userFlags getFlags() const
-        {
-            if (_publicFlags < 0 && _flags >= 0)
-                return _flags;
-            return _publicFlags;
-        }
-
-        // Getter functions for appearance
-        inline std::string getAvatar() const
-        {
-            return _avatar;
-        }
-        inline std::string getAvatarDecoration() const
-        {
-            return _avatarDecoration;
-        }
-        inline std::string getBanner() const
-        {
-            return _banner;
-        }
-        inline int getAccentCol() const
-        {
-            return _accentCol;
-        }
-
-        // Getter functions for private info
-        inline bool hasMFA() const
-        {
-            return _mfaEnabled;
-        }
-        inline bool isVerified() const
-        {
-            return _verified;
-        }
-        inline std::string getEmail() const
-        {
-            return _email;
-        }
-        inline std::string getLocale() const
-        {
-            return _locale;
-        }
-
-        friend void from_json(const nlohmann::json& js, User& u);
-        friend void to_json(nlohmann::json& js, const User& u);
+        userFlags flags;
+        bool mfa_enabled;
+        bool verified;
+        std::string email;
+        std::string locale;
 };
 
 NC_EXPORT inline void to_json(nlohmann::json& js, const User& obj)
