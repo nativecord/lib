@@ -2,7 +2,7 @@
 #include "endpoints.h"
 
 #include "util/assert.h"
-#include "classes/message.h"
+#include "objects/message.h"
 
 #include <libwebsockets.h>
 

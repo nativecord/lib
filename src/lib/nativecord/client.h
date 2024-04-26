@@ -5,8 +5,8 @@
 #include "util/events.h"
 #include "util/macros.h"
 
-#include "classes/user.h"
-#include "classes/activity.h"
+#include "objects/user.h"
+#include "objects/activity.h"
 
 #include <string>
 #include <unordered_map>
