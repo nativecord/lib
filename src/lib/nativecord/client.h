@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gateway.h"
+
 #include "util/macros.h"
 #include "util/events.h"
 
@@ -61,6 +62,7 @@ namespace nativecord
 
             NC_EXPORT bool connect();
 
+
             int handleWss(lws* wsi, lws_callback_reasons reason, char* in, size_t len);
             static int wssCallback(lws* wsi, lws_callback_reasons reason, void* user, void* in, size_t len);
 
@@ -68,7 +70,7 @@ namespace nativecord
 
         private:
             void handleGateway(lws* wsi, char* in);
-            void handleDispatch(lws* wsi, std::string eventName, void* dataPtr);
+            void handleDispatch(lws* wsi, std::string eventName, void* jsPtr);
             void sendJSON(lws* wsi, void* jsPtr) const;
 
             std::unordered_map<std::string, void (*)(Client* client, lws* wsi, void* jsPtr)> _dispatchListeners;

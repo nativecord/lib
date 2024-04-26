@@ -126,9 +126,6 @@ void nativecord::Client::handleGateway(lws* wsi, char* in)
                 data["properties"]["$os"] = "Windows";
                 data["properties"]["$browser"] = "Chrome";
 
-                //data["presence"]["status"] = "online";
-                //data["presence"]["afk"] = false;
-
                 identifyPayload["d"] = data;
                 sendJSON(wsi, &identifyPayload);
                 break;
@@ -168,7 +165,6 @@ void nativecord::websockets::createContext()
     lws_set_log_level(0, 0);
 
     lws_context_creation_info creationInfo{};
-    // creationInfo.port = 443;
     creationInfo.protocols = protocols;
     creationInfo.extensions = extensions;
     creationInfo.gid = -1;
