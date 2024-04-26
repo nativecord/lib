@@ -7,9 +7,9 @@
 
 #include <nlohmann/json.hpp>
 
-static lws_protocols protocols[] = {{"wss", nativecord::Client::wssCallback, 0, NC_MAX_WSS_PACKETSIZE}, {0, 0}};
-static lws_extension extensions[] = {{0, 0, 0}};
-
+/*
+    client implementation
+*/
 inline nativecord::Client::Client(std::string token) : _token(token)
 {
     /*
@@ -26,6 +26,10 @@ inline nativecord::Client::Client(std::string token) : _token(token)
         disconnect event
     */
     _emitter.registerEvent<uint16_t>("disconnect");
+
+    /*
+        dispatch event
+    */
     _emitter.registerEvent<Client*, lws*, void*>("dispatch");
 }
 
