@@ -2,8 +2,8 @@
 
 #include "gateway.h"
 
-#include "util/macros.h"
 #include "util/events.h"
+#include "util/macros.h"
 
 #include "classes/user.h"
 
@@ -12,8 +12,11 @@
 
 /*
     TO-DO:
-        figure out max possible size sent by discord
+        add ring buffer?
+        add error handling (replace asserts)
+        figure out realistic sizes for packets (and ring buffer once implemented)
 */
+
 #define NC_MAX_WSS_PACKETSIZE 4096 * 10
 
 struct lws;
@@ -61,7 +64,6 @@ namespace nativecord
             }
 
             NC_EXPORT bool connect();
-
 
             int handleWss(lws* wsi, lws_callback_reasons reason, char* in, size_t len);
             static int wssCallback(lws* wsi, lws_callback_reasons reason, void* user, void* in, size_t len);
