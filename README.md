@@ -22,7 +22,7 @@
 
 ## Associated projects
 * [client](https://github.com/nativecord/client "client") - A Discord client powered by this library.
-* [imcord](https://github.com/nativecord/client "imcord") - An example UI implementation used by the client.
+* [imcord](https://github.com/nativecord/imcord "imcord") - An example UI implementation used by the client.
 
 ## Requirements
 * CMake 3.29.2
