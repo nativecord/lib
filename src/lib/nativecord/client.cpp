@@ -140,8 +140,9 @@ void nativecord::Client::handleGateway(lws* wsi, char* in)
 
 void nativecord::Client::sendJSON(lws* wsi, void* jsPtr) const
 {
+    nlohmann::json& js = *reinterpret_cast<nlohmann::json*>(jsPtr);
 
-    std::string payloadStr = js->dump();
+    std::string payloadStr = js.dump();
     unsigned char* buff = reinterpret_cast<unsigned char*>(malloc(LWS_PRE + payloadStr.size()));
     ASSERT(buff, "failed to allocate buffer for json str");
     memcpy(buff + LWS_PRE, payloadStr.c_str(), payloadStr.size());
