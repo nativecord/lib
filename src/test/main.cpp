@@ -34,8 +34,18 @@ int main(int /*argc*/, char* argv[])
 
     client._emitter.on<nativecord::Client*>("ready", [](nativecord::Client* client) {
         Log::Info("Client is ready");
-        Log::Info("Logged in as {} | {}", client->getUser()->getUsername(), client->getUser()->getId());
+        Log::Info("Logged in as {} | {}", client->getUser()->username, client->getUser()->id);
+        client->setPersona(STATUS_ONLINE);
     });
+
+    client._emitter.on<nativecord::Client*, lws*, void*>("dispatch", [](nativecord::Client* client, lws*, void* jsPtr) {
+        auto& js = *reinterpret_cast<nlohmann::json*>(jsPtr);
+        std::string type = js["t"].get<std::string>();
+        Log::Verbose("{} received dispatch of type: {}", client->getUser()->username, type);
+    });
+
+    client._emitter.on<uint16_t>("disconnect",
+                                 [](uint16_t code) { Log::Info("Client disconnected with code: {}", code); });
 
     nativecord::websockets::pollEvents();
 
