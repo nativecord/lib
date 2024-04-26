@@ -76,9 +76,13 @@
         ++it;                                                                                                          \
     }
 
+#define _NC_DESERIALIZE(key, val, obj, js)                                                                             \
+    if (js.contains(key) && !js _ADD_BRACKETS(key).is_null())                                                    \
+        js _ADD_BRACKETS(key).get_to(obj.##val);
+
 #define NC_DESERIALIZE(key)                                                                                            \
-    if (js.contains(#key) && !js _ADD_BRACKETS(STR(key)).is_null())                                                                        \
+    if (js.contains(#key) && !js _ADD_BRACKETS(STR(key)).is_null())                                                    \
         js _ADD_BRACKETS(#key).get_to(obj.##key);
 #define NC_DESERIALIZE_UINT64(key)                                                                                     \
-    if (js.contains(#key) && !js _ADD_BRACKETS(#key).is_null())                                                                       \
+    if (js.contains(#key) && !js _ADD_BRACKETS(#key).is_null())                                                        \
         obj.##key = std::stoull(js[#key].get<std::string>());
