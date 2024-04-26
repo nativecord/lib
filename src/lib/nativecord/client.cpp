@@ -19,7 +19,7 @@ inline nativecord::Client::Client(std::string token) : _token(token)
     _dispatchListeners["READY"] = [](Client* client, lws* /*wsi*/, void* jsPtr) {
         nlohmann::json* js = reinterpret_cast<nlohmann::json*>(jsPtr);
         js->at("d")["user"].get_to(client->_localUser);
-        client->_emitter.fireEvent("ready", client);
+        client->_emitter.fireEvent("ready", std::forward<Client*>(client));
     };
 
     _emitter.registerEvent<Client*, lws*, void*>("dispatch");
