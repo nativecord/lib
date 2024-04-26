@@ -78,46 +78,40 @@ struct User
 
 NC_EXPORT inline void to_json(nlohmann::json& js, const User& obj)
 {
-    NC_SERIALIZE("id", id);
-    NC_SERIALIZE("username", username);
-    NC_SERIALIZE_OPT_STR("global_name", globalName);
-    NC_SERIALIZE("bot", isBot);
-    NC_SERIALIZE("system", isSystem);
-    NC_SERIALIZE_OPT_NUM("premium_type", premiumType);
-    NC_SERIALIZE_OPT_NUM("public_flags", publicFlags);
+    NC_SERIALIZE(id);
+    NC_SERIALIZE(username);
+    NC_SERIALIZE(global_name);
+    NC_SERIALIZE(bot);
+    NC_SERIALIZE(system);
+    NC_SERIALIZE(premium_type);
+    NC_SERIALIZE(public_flags);
+    NC_SERIALIZE(avatar);
+    NC_SERIALIZE(avatar_decoration);
+    NC_SERIALIZE(banner);
+    NC_SERIALIZE(accent_color);
+    NC_SERIALIZE(flags);
+    NC_SERIALIZE(mfa_enabled);
+    NC_SERIALIZE(email);
+    NC_SERIALIZE(locale);
 
-    NC_SERIALIZE("avatar", avatar);
-    NC_SERIALIZE_OPT_STR("avatar_decoration", avatarDecoration);
-    NC_SERIALIZE_OPT_STR("banner", banner);
-    NC_SERIALIZE_OPT_NUM("accent_color", accentCol);
-
-    NC_SERIALIZE_OPT_NUM("flags", flags);
-    NC_SERIALIZE_OPT("mfa_enabled", mfaEnabled);
-    NC_SERIALIZE_OPT("verified", verified);
-    NC_SERIALIZE_OPT_STR("email", email);
-    NC_SERIALIZE_OPT_NUM("flags", flags); 
-    NC_SERIALIZE_OPT_STR("locale", locale);
+    NC_SERIALIZE_CLEANUP(js);
 }
 
 NC_EXPORT inline void from_json(const nlohmann::json& js, User& obj)
 {
-    NC_DESERIALIZE_UINT64("id", id);
-    NC_DESERIALIZE("username", username);
-    NC_DESERIALIZE("global_name", globalName);
-    NC_DESERIALIZE("bot", isBot);
-    NC_DESERIALIZE("system", isSystem);
-    NC_DESERIALIZE("premium_type", premiumType);
-    NC_DESERIALIZE("public_flags", publicFlags);
-
-    NC_DESERIALIZE("avatar", avatar);
-    NC_DESERIALIZE("avatar_decoration", avatarDecoration);
-    NC_DESERIALIZE("banner", banner);
-    NC_DESERIALIZE("accent_color", accentCol);
-
-    NC_DESERIALIZE("flags", flags);
-    NC_DESERIALIZE("mfa_enabled", mfaEnabled);
-    NC_DESERIALIZE("verified", verified);
-    NC_DESERIALIZE("email", email);
-    NC_DESERIALIZE("flags", flags);
-    NC_DESERIALIZE("locale", locale);
+    NC_DESERIALIZE_UINT64(id);
+    NC_DESERIALIZE(username);
+    NC_DESERIALIZE(global_name);
+    NC_DESERIALIZE(bot);
+    NC_DESERIALIZE(system);
+    NC_DESERIALIZE(premium_type);
+    NC_DESERIALIZE(public_flags);
+    NC_DESERIALIZE(avatar);
+    NC_DESERIALIZE(avatar_decoration);
+    NC_DESERIALIZE(banner);
+    NC_DESERIALIZE(accent_color);
+    NC_DESERIALIZE(flags);
+    NC_DESERIALIZE(mfa_enabled);
+    NC_DESERIALIZE(email);
+    NC_DESERIALIZE(locale);
 }
