@@ -70,7 +70,6 @@ namespace nativecord
 
         private:
             void handleGateway(lws* wsi, char* in);
-            void handleDispatch(lws* wsi, std::string eventName, void* jsPtr);
             void sendJSON(lws* wsi, void* jsPtr) const;
 
             std::unordered_map<std::string, void (*)(Client* client, lws* wsi, void* jsPtr)> _dispatchListeners;
