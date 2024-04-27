@@ -5,12 +5,14 @@
 #include "util/events.h"
 #include "util/macros.h"
 
-#include "objects/user.h"
 #include "objects/activity.h"
+#include "objects/user.h"
 
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
+
+#include <nlohmann/json.hpp>
 
 /*
     TO-DO:
@@ -56,10 +58,15 @@ namespace nativecord
 
             int handleWss(lws* wsi, lws_callback_reasons reason, char* in, size_t len);
             static int wssCallback(lws* wsi, lws_callback_reasons reason, void* user, void* in, size_t len);
+            template <typename Func> inline void NC_EXPORT on(std::string eventName, Func func)
+            {
+                _emitter.on(eventName, func);
+            }
 
-            EventEmitter _emitter;
+
 
         private:
+            EventEmitter _emitter;
             lws* _wsInterface = nullptr;
 
             void handleGateway(lws* wsi, char* in);

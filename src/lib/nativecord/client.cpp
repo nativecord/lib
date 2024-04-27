@@ -41,7 +41,7 @@ inline nativecord::Client::Client(std::string token) : _token(token)
     /*
         dispatch event
     */
-    _emitter.registerEvent<Client*, lws*, void*>("dispatch");
+    _emitter.registerEvent<Client*, lws*, nlohmann::json&>("dispatch");
 }
 
 NC_EXPORT bool nativecord::Client::connect()
@@ -133,7 +133,7 @@ void nativecord::Client::handleGateway(lws* wsi, char* in)
     {
         case GATEWAY_DISPATCH:
             {
-                _emitter.fireEvent("dispatch", this, wsi, reinterpret_cast<void*>(&payload));
+                _emitter.fireEvent("dispatch", this, wsi, payload);
                 std::string eventName = payload.at("t").get<std::string>();
                 if (_dispatchListeners.contains(eventName))
                     _dispatchListeners[eventName](this, wsi, &payload);
