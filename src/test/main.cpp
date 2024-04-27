@@ -37,7 +37,7 @@ int main(int /*argc*/, char* argv[])
     client.setIntents(INTENT_GUILDS | INTENT_GUILD_MESSAGES | INTENT_GUILD_MEMBERS);
     ASSERT(client.connect(), "client failed to connect");
 
-    client._emitter.on<nativecord::Client*>("ready", [](nativecord::Client* client) {
+    client.on("ready", [](nativecord::Client* client) {
         Log::Info("Client is ready");
         Log::Info("Logged in as {} | {}", client->getUser()->username, client->getUser()->id);
 
@@ -54,18 +54,16 @@ int main(int /*argc*/, char* argv[])
         client->setPersona(STATUS_IDLE, &activities);
     });
 
-    client._emitter.on<nativecord::Client*, lws*, void*>("dispatch", [](nativecord::Client* client, lws*, void* jsPtr) {
-        auto& js = *reinterpret_cast<nlohmann::json*>(jsPtr);
+    client.on("dispatch", [](nativecord::Client* client, lws*, nlohmann::json& js) {
         std::string type = js["t"].get<std::string>();
         Log::Verbose("{} received dispatch of type: {}", client->getUser()->username, type);
     });
 
-    client._emitter.on<nativecord::Client*, Message*>("message", [](nativecord::Client* /*client*/, Message* msg) {
+    client.on("message", [](nativecord::Client* /*client*/, Message* msg) {
         Log::Verbose("Client received message from {} : {}", msg->author.global_name, msg->content);
     });
 
-    client._emitter.on<uint16_t>("disconnect",
-                                 [](uint16_t code) { Log::Info("Client disconnected with code: {}", code); });
+    client.on("disconnect", [](uint16_t code) { Log::Info("Client disconnected with code: {}", code); });
 
     nativecord::websockets::pollEvents();
 
