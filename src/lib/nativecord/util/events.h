@@ -10,12 +10,23 @@
 
 /*
     to-do:
-        deduct function args from Func template instead of requiring args manually (::on)
-        improve safety
-        see if more asserts can be made static
+        test for safety?
+        try to get as many compile-time asserts as possible
 */
 
-// not using a pair and using this struct because i plan on storing more info
+template <typename T> struct function_traits : public function_traits<decltype(&T::operator())>
+{
+};
+
+template <typename ClassType, typename ReturnType, typename... Args>
+struct function_traits<ReturnType (ClassType::*)(Args...) const>
+{
+        using argTypes = std::tuple<Args...>;
+};
+
+template <typename F> using function_info = function_traits<decltype(&F::operator())>;
+
+// not using a pair but using this struct instead because i plan on storing more info
 struct EventInfo
 {
     public:
@@ -29,6 +40,14 @@ class EventEmitter
         template <typename... T> std::vector<size_t> getTypeHashCodes()
         {
             return {typeid(T).hash_code()...};
+        }
+        template <typename Tuple, size_t Index = 0> void getTupleTypeHashCodes(std::vector<size_t>* hashList)
+        {
+            if constexpr (Index < std::tuple_size_v<Tuple>)
+            {
+                hashList->push_back(typeid(std::tuple_element<Index, Tuple>::type).hash_code());
+                getTupleTypeHashCodes<Tuple, Index + 1>(hashList);
+            }
         }
 
     public:
@@ -50,7 +69,6 @@ class EventEmitter
             std::unique_ptr<EventInfo>& eventInfo = it->second;
 
             std::vector<size_t> types = getTypeHashCodes<Args...>();
-
             ASSERT(eventInfo->_types == types, "type mismatch during event fire");
 
             using FuncType = std::function<void(Args...)>;
@@ -61,21 +79,22 @@ class EventEmitter
             }
         }
 
-        template <typename... Args, typename Func> inline void on(std::string eventName, Func func)
+        template <typename Func> inline void on(std::string eventName, Func func)
         {
-            static_assert(std::is_invocable_r<void, Func, Args...>::value,
-                          "listener signature does not match event handler signature.");
-            static_assert(std::is_same_v<void, std::invoke_result_t<Func, Args...>>, "listener must return void");
-
             ASSERT(_events.contains(eventName), "attempted to register callback for non-existing event");
             auto it = _events.find(eventName);
-            ASSERT(it != _events.end(), "couldn't find eventinfo");
-            std::unique_ptr<EventInfo>& eventInfo = it->second;
+            ASSERT(it != _events.end(), "couldn't find event");
 
-            std::vector<size_t> types = getTypeHashCodes<Args...>();
-            ASSERT(eventInfo->_types == types, "type mismatch during event listener registration");
+            std::unique_ptr<EventInfo>& event = it->second;
 
-            eventInfo->_functions.push_back(func);
+            using FI = function_info<decltype(func)>;
+            std::vector<size_t> funcTypeHashes{};
+            getTupleTypeHashCodes<typename FI::argTypes>(&funcTypeHashes);
+
+            ASSERT(event->_types.size() == funcTypeHashes.size(), "argument count did not match");
+            ASSERT(funcTypeHashes == event->_types, "func type does not match event type");
+
+            event->_functions.push_back(func);
         }
 
     private:
