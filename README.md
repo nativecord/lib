@@ -41,9 +41,10 @@ void yourFunction() {
 	client.setIntents(INTENT_GUILDS | INTENT_GUILD_MESSAGES | INTENT_GUILD_MEMBERS);
 	client.connect();
 	
-	client._emitter.on<nativecord::Client*>("ready", [](nativecord::Client* client) {
+	client.on("ready", [](nativecord::Client* client) {
 		Log::Info("Client is ready");
  		Log::Info("Logged in as {} | {}", client->getUser()->username, client->getUser()->id);
+		client->setPersona(STATUS_IDLE);
 	});
 
 	/*
