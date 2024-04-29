@@ -7,7 +7,7 @@
 
 struct ActivityTimestamps
 {
-        std::optional<int> start>;
+        std::optional<int> start;
         std::optional<int> end;
 };
 NC_JSON_DECLFUNCS(ActivityTimestamps, start, end);
