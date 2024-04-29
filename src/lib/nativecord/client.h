@@ -14,31 +14,15 @@
 
 #include <nlohmann/json.hpp>
 
-/*
-    TO-DO:
-        add ring buffer?
-        add error handling (replace asserts)
-        figure out realistic sizes for packets (and ring buffer once implemented)
-*/
-
-#define NC_MAX_WSS_PACKETSIZE 4096 * 10
-
 struct lws;
-struct lws_context;
-enum lws_callback_reasons : int;
+
+NC_WARNING_PUSH
+NC_DISABLE_WARNING(4471)
+enum lws_callback_reasons;
+NC_WARNING_POP
 
 namespace nativecord
 {
-    namespace websockets
-    {
-        void createContext();
-        void pollEvents();
-
-        static lws_context* g_context = nullptr;
-        static int g_connections = 0;
-        static bool g_shouldStop = false;
-    }
-
     class Client
     {
         public:
@@ -54,32 +38,35 @@ namespace nativecord
 
             NC_EXPORT void setPersona(userStatus status, std::vector<Activity>* activities = {});
 
-            NC_EXPORT bool connect();
+            NC_EXPORT void connect();
 
-            int handleWss(lws* wsi, lws_callback_reasons reason, char* in, size_t len);
-            static int wssCallback(lws* wsi, lws_callback_reasons reason, void* user, void* in, size_t len);
+            void gatewayHandler(lws* wsi, char* in);
+            int websocketHandler(lws* wsi, lws_callback_reasons reason, char* in, size_t len);
+
             template <typename Func> inline void NC_EXPORT on(std::string eventName, Func func)
             {
                 _emitter.on(eventName, func);
             }
 
-
+            NC_EXPORT static void pollEvents();
 
         private:
+            void identify(nlohmann::json& js);
+            void registerEvents();
+
+            void sendJson(nlohmann::json& js);
+
+            std::unordered_map<std::string, void (*)(Client* client, lws* wsi, nlohmann::json& js)> _dispatchListeners;
             EventEmitter _emitter;
-            lws* _wsInterface = nullptr;
-
-            void handleGateway(lws* wsi, char* in);
-            void sendJSON(lws* wsi, void* jsPtr) const;
-
-            std::unordered_map<std::string, void (*)(Client* client, lws* wsi, void* jsPtr)> _dispatchListeners;
 
             std::string _token;
-
-            int _heartbeatInterval = -1;
-            int _lastSeq = -1;
             int _intents = -1;
 
-            User _localUser;
+            int _lastSeq = -1;
+            int _heartbeatInterval = -1;
+
+            User _user;
+
+            lws* _wsi;
     };
 }
