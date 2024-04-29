@@ -43,11 +43,12 @@ int main(int /*argc*/, char* argv[])
 
         auto now = std::chrono::system_clock::now().time_since_epoch();
 
+        int currTime = static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(now).count());
+
         Activity testActivity;
         testActivity.type = ACTIVITY_WATCHING;
-        testActivity.name = "how discord ratelimits me";
-        testActivity.timestamps.start =
-            static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(now).count());
+        testActivity.name = "something";
+        testActivity.timestamps = {currTime, {}};
         std::vector<Activity> activities;
         activities.push_back(testActivity);
 
