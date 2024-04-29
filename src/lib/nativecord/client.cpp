@@ -222,10 +222,7 @@ NC_EXPORT void nativecord::Client::setPersona(userStatus status, std::vector<Act
     ASSERT(_wsInterface, "called setPersona from outside an event");
     nlohmann::json payload;
     payload["op"] = GATEWAY_PRESENCE_UPDATE;
-    payload["d"] = {{"status", status},
-                    {"afk", false},
-                    {"activities", nlohmann::json::array({})},
-                    {"since", nullptr}};
+    payload["d"] = {{"status", status}, {"afk", false}, {"activities", nlohmann::json::array({})}, {"since", nullptr}};
 
     if (activities)
     {
