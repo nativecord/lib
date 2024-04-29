@@ -18,8 +18,8 @@ struct EmbedMedia
 {
         std::string url;
         std::optional<std::string> proxy_url;
-        std::optional<int> height = 1;
-        std::optional<int> width = -1;
+        std::optional<int> height;
+        std::optional<int> width;
 };
 NC_JSON_DECLFUNCS(EmbedMedia, url, proxy_url, height, width);
 
@@ -67,7 +67,7 @@ struct Embed
         std::optional<std::string> description;
         std::optional<std::string> url;
         std::optional<std::string> timestamp;
-        std::optional<int> color = -1;
+        std::optional<int> color;
         std::optional<EmbedFooter> footer;
         std::optional<EmbedMedia> image;
         std::optional<EmbedMedia> thumbnail;

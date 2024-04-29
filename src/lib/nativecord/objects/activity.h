@@ -7,15 +7,15 @@
 
 struct ActivityTimestamps
 {
-        int start = -1;
-        int end = -1;
+        std::optional<int> start>;
+        std::optional<int> end;
 };
 NC_JSON_DECLFUNCS(ActivityTimestamps, start, end);
 
 struct ActivityEmoji
 {
         std::string name = "";
-        std::optional<uint64_t> id = 0;
+        std::optional<uint64_t> id;
         std::optional<bool> animated = false;
 };
 NC_JSON_DECLFUNCS(ActivityEmoji, name, id, animated);
@@ -67,7 +67,7 @@ struct Activity
         activityType type;
         std::optional<std::string> url;
 
-        int created_at = -1;
+        int created_at;
         std::optional<ActivityTimestamps> timestamps;
         std::optional<uint64_t> application_id;
         std::optional<std::string> details;

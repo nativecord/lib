@@ -135,7 +135,7 @@ NC_JSON_DECLFUNCS(ReactionCountDetails, burst, normal);
 
 struct Reaction
 {
-        int count = -1;
+        int count;
         ReactionCountDetails count_details;
         bool me;
         bool me_burst;
