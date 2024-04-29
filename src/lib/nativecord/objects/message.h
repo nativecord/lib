@@ -5,12 +5,17 @@
 #include "nativecord/objects/embed.h"
 #include "nativecord/objects/role.h"
 #include "nativecord/objects/user.h"
-#include "nativecord/util/macros.h"
+#include "nativecord/util/jsonutils.h"
 
-#include <any>
+// #include <functional>
+#include <stdint.h>
 #include <vector>
 
-#include <nlohmann/json.hpp>
+/*
+    TO-DO
+        implement self references
+        (Message::referenced_message, MessageInteractionMetadata::triggering_interaction_metadata)
+*/
 
 enum messageTypes : int32_t
 {
@@ -78,63 +83,58 @@ struct ChannelMention
         std::string name;
         int type;
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ChannelMention, id, guild_id, name, type);
+NC_JSON_DECLFUNCS(ChannelMention, id, guild_id, name, type);
 
 struct MessageActivity
 {
         int type;
-        std::string party_id; // optional
+        std::optional<std::string> party_id;
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(MessageActivity, type, party_id);
+NC_JSON_DECLFUNCS(MessageActivity, type, party_id);
 
 struct MessageReference
 {
-        uint64_t message_id;     // optional
-        uint64_t channel_id;     // optional
-        uint64_t guild_id;       // optional
-        bool fail_if_not_exists; // optional
+        std::optional<uint64_t> message_id;
+        std::optional<uint64_t> channel_id;
+        std::optional<uint64_t> guild_id;
+        std::optional<bool> fail_if_not_exists;
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(MessageReference, message_id, channel_id, guild_id, fail_if_not_exists);
+NC_JSON_DECLFUNCS(MessageReference, message_id, channel_id, guild_id, fail_if_not_exists);
 
 struct MessageInteractionMetadata
 {
         uint64_t id;
         messageInteractionType type;
         User user;
-        // authorizing_integration_owners;
+        std::vector<int> authorizing_integration_owners;
         uint64_t original_response_message_id;
         uint64_t interacted_message_id;
-        // MessageInteractionMetadata triggering_interaction_metadata;
+        // std::reference_wrapper<const MessageInteractionMetadata> triggering_interaction_metadata;
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(MessageInteractionMetadata, id, type, user,
-                                                original_response_message_id, interacted_message_id);
+NC_JSON_DECLFUNCS(MessageInteractionMetadata, id, type, user, original_response_message_id, interacted_message_id);
 
 struct Emoji
 {
-    public:
-        uint64_t id;             // optional val
-        std::string name;        // optional val
-        std::vector<Role> roles; // optional
-        User user;               // optional
-        bool require_colons;     // optional
-        bool managed;            // optional
-        bool animated;           // optional
-        bool available;          // optional
+        std::optional<uint64_t> id;
+        std::optional<std::string> name;
+        std::optional<std::vector<Role>> roles;
+        std::optional<User> user;
+        std::optional<bool> require_colons;
+        std::optional<bool> managed;
+        std::optional<bool> animated;
+        std::optional<bool> available;
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Emoji, id, name, roles, user, require_colons, managed, animated,
-                                                available);
+NC_JSON_DECLFUNCS(Emoji, id, name, roles, user, require_colons, managed, animated, available);
 
 struct ReactionCountDetails
 {
-    public:
         int burst;
         int normal;
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ReactionCountDetails, burst, normal);
+NC_JSON_DECLFUNCS(ReactionCountDetails, burst, normal);
 
 struct Reaction
 {
-    public:
         int count = -1;
         ReactionCountDetails count_details;
         bool me;
@@ -142,121 +142,97 @@ struct Reaction
         Emoji emoji; // partial
         std::vector<int> burst_colors;
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Reaction, count, count_details, me, me_burst, emoji, burst_colors);
+NC_JSON_DECLFUNCS(Reaction, count, count_details, me, me_burst, emoji, burst_colors);
 
 struct StickerItem
 {
-    public:
         uint64_t id;
         std::string name;
         int format_type;
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(StickerItem, id, name, format_type);
+NC_JSON_DECLFUNCS(StickerItem, id, name, format_type);
+
+struct RoleSubscriptionData
+{
+        uint64_t role_subscription_listing_id;
+        std::string tier_name;
+        int total_months_subscribed;
+        bool is_renewal;
+};
+NC_JSON_DECLFUNCS(RoleSubscriptionData, role_subscription_listing_id, tier_name, total_months_subscribed, is_renewal);
+
+struct Resolved
+{
+        std::optional<std::vector<uint64_t>> users;
+        std::optional<std::vector<uint64_t>> members;
+        std::optional<std::vector<uint64_t>> roles;
+        std::optional<std::vector<uint64_t>> channels;
+        std::optional<std::vector<uint64_t>> messages;
+        std::optional<std::vector<uint64_t>> attachments;
+};
+NC_JSON_DECLFUNCS(Resolved, users, members, roles, channels, messages, attachments);
+
+struct PollMediaObject
+{
+        std::optional<std::string> text;
+        std::optional<Emoji> emoji; // partial
+};
+NC_JSON_DECLFUNCS(PollMediaObject, text, emoji);
+
+struct PollAnswerObject
+{
+        std::optional<int> answer_id;
+        PollMediaObject poll_media;
+};
+NC_JSON_DECLFUNCS(PollAnswerObject, answer_id, poll_media);
+
+struct PollCreateRequest
+{
+        PollMediaObject question;
+        std::vector<PollAnswerObject> answers;
+        int duration;
+        bool allow_multiselect;
+        std::optional<int> layout_type;
+};
+NC_JSON_DECLFUNCS(PollCreateRequest, question, answers, duration, allow_multiselect, layout_type);
 
 struct Message
 {
-    public:
         std::string id;
         std::string channel_id;
         std::string webhook_id;
         User author;
         std::string content;
         std::string timestamp;
-        std::string edited_timestamp; // optional
+        std::optional<std::string> edited_timestamp;
         bool tts;
         bool mention_everyone;
         bool pinned;
-
         std::vector<User> mentions;
-        std::vector<ChannelMention> mention_channels; // optional
+        std::optional<std::vector<ChannelMention>> mention_channels;
         std::vector<Role> mention_roles;
-        std::vector<Attachment> attachments; // optional
+        std::optional<std::vector<Attachment>> attachments;
         std::vector<Embed> embeds;
-        std::vector<Reaction> reactions; // optional
-
-        std::string nonce; // optional
+        std::optional<std::vector<Reaction>> reactions;
+        std::optional<std::string> nonce;
         int type;
-
         // Application application;
-
         uint64_t application_id;
-        MessageReference message_reference; // optional
-        messageFlags flags;                 // optional
-
-        // Message referenced_message; // optional
-
+        std::optional<MessageReference> message_reference;
+        std::optional<messageFlags> flags;
+        std::optional<std::reference_wrapper<Message>> referenced_message;
         MessageInteractionMetadata interaction_metadata;
-
         // MessageInteraction interaction; // deprecated
-
-        Channel thread;                         // optional
-                                                // MessageComponents components; // optional
-        std::vector<StickerItem> sticker_items; // optional
-        // std::vector<Sticker> stickers;                 // optional, deprecated
-
-        int position; // optional
-
-        // RoleSubscriptionData role_subscription_data; // optional
-        // Resolved resolved; // optional
-        // Poll poll; // optional
+        std::optional<Channel> thread;
+        // MessageComponents components; // optional
+        std::optional<std::vector<StickerItem>> sticker_items;
+        // std::optional<std::vector<Sticker>> stickers; // deprecated
+        std::optional<int> position;
+        std::optional<RoleSubscriptionData> role_subscription_data;
+        std::optional<Resolved> resolved;
+        std::optional<PollCreateRequest> poll;
 };
-
-NC_EXPORT inline void to_json(nlohmann::json& js, const Message& obj)
-{
-    NC_SERIALIZE(id);
-    NC_SERIALIZE(channel_id);
-    NC_SERIALIZE(webhook_id);
-    NC_SERIALIZE(author);
-    NC_SERIALIZE(content);
-    NC_SERIALIZE(timestamp);
-    NC_SERIALIZE(edited_timestamp);
-    NC_SERIALIZE(tts);
-    NC_SERIALIZE(mention_everyone);
-    NC_SERIALIZE(pinned);
-    NC_SERIALIZE(mentions);
-    NC_SERIALIZE(mention_channels);
-    NC_SERIALIZE(mention_roles);
-    NC_SERIALIZE(attachments);
-    NC_SERIALIZE(embeds);
-    NC_SERIALIZE(reactions);
-    NC_SERIALIZE(nonce);
-    NC_SERIALIZE(type);
-    NC_SERIALIZE(application_id);
-    NC_SERIALIZE(message_reference);
-    NC_SERIALIZE(flags);
-    NC_SERIALIZE(interaction_metadata);
-    NC_SERIALIZE(thread);
-    NC_SERIALIZE(sticker_items);
-    NC_SERIALIZE(position);
-
-    NC_SERIALIZE_CLEANUP(js);
-}
-
-NC_EXPORT inline void from_json(const nlohmann::json& js, Message& obj)
-{
-    NC_DESERIALIZE(id);
-    NC_DESERIALIZE(channel_id);
-    NC_DESERIALIZE(webhook_id);
-    NC_DESERIALIZE(author);
-    NC_DESERIALIZE(content);
-    NC_DESERIALIZE(timestamp);
-    NC_DESERIALIZE(edited_timestamp);
-    NC_DESERIALIZE(tts);
-    NC_DESERIALIZE(mention_everyone);
-    NC_DESERIALIZE(pinned);
-    NC_DESERIALIZE(mentions);
-    NC_DESERIALIZE(mention_channels);
-    NC_DESERIALIZE(mention_roles);
-    NC_DESERIALIZE(attachments);
-    NC_DESERIALIZE(embeds);
-    NC_DESERIALIZE(reactions);
-    NC_DESERIALIZE(nonce);
-    NC_DESERIALIZE(type);
-    NC_DESERIALIZE(application_id);
-    NC_DESERIALIZE(message_reference);
-    NC_DESERIALIZE(flags);
-    NC_DESERIALIZE(interaction_metadata);
-    NC_DESERIALIZE(thread);
-    NC_DESERIALIZE(sticker_items);
-    NC_DESERIALIZE(position);
-}
+NC_JSON_DECLFUNCS(Message, id, channel_id, webhook_id, author, content, timestamp, edited_timestamp, tts,
+                  mention_everyone, pinned, mentions, mention_channels, mention_roles, attachments, embeds, reactions,
+                  nonce, type, application_id, message_reference, flags, /*referenced_message,*/
+                  interaction_metadata, thread, sticker_items, position, role_subscription_data, resolved, poll)

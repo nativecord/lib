@@ -1,8 +1,7 @@
 #pragma once
 
-#include "nativecord/util/macros.h"
+#include "nativecord/util/jsonutils.h"
 
-#include <nlohmann/json.hpp>
 #include <stdint.h>
 #include <string>
 
@@ -52,73 +51,23 @@ enum userFlags : int64_t
 
 struct User
 {
-    public:
-        /*
-            base info
-        */
-        uint64_t id = 0;
+        std::string id;
         std::string username;
-        // std::string _discriminator;
+        // std::string discriminator; // deprecated
         std::string global_name;
         bool bot;
         bool system;
-        int premium_type = -1;
-        userFlags public_flags = static_cast<userFlags>(-1);
-
-        /*
-            appearance
-        */
+        int premium_type;
+        userFlags public_flags;
         std::string avatar;
         std::string avatar_decoration;
         std::string banner;
-        int accent_color = -1;
-
-        /*
-            private info (only for local user)
-        */
+        int accent_color;
         userFlags flags;
         bool mfa_enabled;
         bool verified;
         std::string email;
         std::string locale;
 };
-
-NC_EXPORT inline void to_json(nlohmann::json& js, const User& obj)
-{
-    NC_SERIALIZE(id);
-    NC_SERIALIZE(username);
-    NC_SERIALIZE(global_name);
-    NC_SERIALIZE(bot);
-    NC_SERIALIZE(system);
-    NC_SERIALIZE(premium_type);
-    NC_SERIALIZE(public_flags);
-    NC_SERIALIZE(avatar);
-    NC_SERIALIZE(avatar_decoration);
-    NC_SERIALIZE(banner);
-    NC_SERIALIZE(accent_color);
-    NC_SERIALIZE(flags);
-    NC_SERIALIZE(mfa_enabled);
-    NC_SERIALIZE(email);
-    NC_SERIALIZE(locale);
-
-    NC_SERIALIZE_CLEANUP(js);
-}
-
-NC_EXPORT inline void from_json(const nlohmann::json& js, User& obj)
-{
-    NC_DESERIALIZE_UINT64(id);
-    NC_DESERIALIZE(username);
-    NC_DESERIALIZE(global_name);
-    NC_DESERIALIZE(bot);
-    NC_DESERIALIZE(system);
-    NC_DESERIALIZE(premium_type);
-    NC_DESERIALIZE(public_flags);
-    NC_DESERIALIZE(avatar);
-    NC_DESERIALIZE(avatar_decoration);
-    NC_DESERIALIZE(banner);
-    NC_DESERIALIZE(accent_color);
-    NC_DESERIALIZE(flags);
-    NC_DESERIALIZE(mfa_enabled);
-    NC_DESERIALIZE(email);
-    NC_DESERIALIZE(locale);
-}
+NC_JSON_DECLFUNCS(User, id, username, global_name, bot, system, premium_type, public_flags, avatar, avatar_decoration,
+                  banner, accent_color, flags, mfa_enabled, verified, email, locale)

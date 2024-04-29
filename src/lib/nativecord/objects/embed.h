@@ -1,52 +1,46 @@
 #pragma once
 
+#include "nativecord/util/jsonutils.h"
+
 #include <string>
 #include <vector>
-
-#include <nlohmann/json.hpp>
-
-#include "nativecord/util/macros.h"
+#include <optional>
 
 struct EmbedFooter
 {
-    public:
         std::string text;
         std::string icon_url;
         std::string proxy_icon_url;
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(EmbedFooter, text, icon_url, proxy_icon_url);
+NC_JSON_DECLFUNCS(EmbedFooter, text, icon_url, proxy_icon_url);
 
 struct EmbedMedia
 {
-    public:
         std::string url;
-        std::string proxy_url; // optional
-        int height = 1;        // optional
-        int width = -1;        // optional
+        std::optional<std::string> proxy_url;
+        std::optional<int> height = 1;
+        std::optional<int> width = -1;
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(EmbedMedia, url, proxy_url, height, width);
+NC_JSON_DECLFUNCS(EmbedMedia, url, proxy_url, height, width);
 
 struct EmbedProvider
 {
-    public:
-        std::string name; // optional
-        std::string url;  // optional
+        std::optional<std::string> name;
+        std::optional<std::string> url;
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(EmbedProvider, name, url);
+NC_JSON_DECLFUNCS(EmbedProvider, name, url);
 
 struct EmbedAuthor
 {
-    public:
         std::string name;
-        std::string url;            // optional
-        std::string icon_url;       // optional
-        std::string proxy_icon_url; // optional
+        std::optional<std::string> url;
+        std::optional<std::string> icon_url;
+        std::optional<std::string> proxy_icon_url;
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(EmbedAuthor, name, url, icon_url, proxy_icon_url);
+NC_JSON_DECLFUNCS(EmbedAuthor, name, url, icon_url, proxy_icon_url);
 
 struct EmbedField
 {
-    public:
         std::string name;
         std::string value;
         bool isInline; // optional
@@ -68,54 +62,19 @@ NC_EXPORT inline void from_json(const nlohmann::json& js, EmbedField& obj)
 
 struct Embed
 {
-    public:
-        std::string title;              // optional
-        std::string type;               // optional
-        std::string description;        // optional
-        std::string url;                // optional
-        std::string timestamp;          // optional
-        int color = -1;                 // optional
-        EmbedFooter footer;             // optional
-        EmbedMedia image;               // optional
-        EmbedMedia thumbnail;           // optional
-        EmbedMedia video;               // optional
-        EmbedProvider provider;         // optional
-        EmbedAuthor author;             // optional
-        std::vector<EmbedField> fields; // optional
+        std::optional<std::string> title;
+        std::optional<std::string> type;
+        std::optional<std::string> description;
+        std::optional<std::string> url;
+        std::optional<std::string> timestamp;
+        std::optional<int> color = -1;
+        std::optional<EmbedFooter> footer;
+        std::optional<EmbedMedia> image;
+        std::optional<EmbedMedia> thumbnail;
+        std::optional<EmbedMedia> video;
+        std::optional<EmbedProvider> provider;
+        std::optional<EmbedAuthor> author;
+        std::optional<std::vector<EmbedField>> fields;
 };
-
-NC_EXPORT inline void to_json(nlohmann::json& js, const Embed& obj)
-{
-    NC_SERIALIZE(title);
-    NC_SERIALIZE(type);
-    NC_SERIALIZE(description);
-    NC_SERIALIZE(url);
-    NC_SERIALIZE(timestamp);
-    NC_SERIALIZE(color);
-    NC_SERIALIZE(footer);
-    NC_SERIALIZE(image);
-    NC_SERIALIZE(thumbnail);
-    NC_SERIALIZE(video);
-    NC_SERIALIZE(provider);
-    NC_SERIALIZE(author);
-    NC_SERIALIZE(fields);
-
-    NC_SERIALIZE_CLEANUP(js);
-}
-
-NC_EXPORT inline void from_json(const nlohmann::json& js, Embed& obj)
-{
-    NC_DESERIALIZE(title)
-    NC_DESERIALIZE(type);
-    NC_DESERIALIZE(description);
-    NC_DESERIALIZE(url);
-    NC_DESERIALIZE(timestamp);
-    NC_DESERIALIZE(color);
-    NC_DESERIALIZE(footer);
-    NC_DESERIALIZE(image);
-    NC_DESERIALIZE(thumbnail);
-    NC_DESERIALIZE(video);
-    NC_DESERIALIZE(provider);
-    NC_DESERIALIZE(author);
-    NC_DESERIALIZE(fields);
-}
+NC_JSON_DECLFUNCS(Embed, title, type, description, url, timestamp, color, footer, image, thumbnail, video, provider,
+                  author, fields);

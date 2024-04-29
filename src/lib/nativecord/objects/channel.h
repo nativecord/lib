@@ -1,13 +1,13 @@
 #pragma once
 
-#include "nativecord/util/macros.h"
+#include "nativecord/util/jsonutils.h"
 
 #include "nativecord/objects/guild.h"
 #include "nativecord/objects/message.h"
 #include "nativecord/objects/misc.h"
 #include "nativecord/objects/user.h"
 
-#include <nlohmann/json.hpp>
+#include <optional>
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -43,70 +43,70 @@ struct ThreadMetadata
         int auto_archive_duration;
         std::string archive_timestamp;
         bool locked;
-        bool invitable;               // optional
-        std::string create_timestamp; // optional
+        std::optional<bool> invitable;
+        std::optional<std::string> create_timestamp;
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ThreadMetadata, archived, auto_archive_duration, archive_timestamp,
+NC_JSON_DECLFUNCS(ThreadMetadata, archived, auto_archive_duration, archive_timestamp,
                                                 locked, invitable, create_timestamp);
 
 struct ThreadMember
 {
     public:
-        uint64_t id; // optional
+        std::optional<uint64_t> id;
         uint64_t user_id;
-        std::string join_timestamp; // optional
+        std::optional<std::string> join_timestamp;
         int flags;                  // ?
-        GuildMember member;         // optional
+        std::optional<GuildMember> member;
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ThreadMember, id, user_id, join_timestamp, flags, member);
+NC_JSON_DECLFUNCS(ThreadMember, id, user_id, join_timestamp, flags, member);
 
 struct DefaultReaction
 {
     public:
-        uint64_t emoji_id;      // optional val
-        std::string emoji_name; // optional val
+        std::optional<uint64_t> emoji_id;
+        std::optional<std::string> emoji_name;
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(DefaultReaction, emoji_id, emoji_name);
+NC_JSON_DECLFUNCS(DefaultReaction, emoji_id, emoji_name);
 
 struct Channel
 {
     public:
         uint64_t id;
         channelType type;
-        uint64_t guild_id;                            // optional
-        int position;                                 // optional
-        std::vector<Overwrite> permission_overwrites; // optional
-        std::string name;                             // optional
-        std::string topic;                            // optional
-        bool nsfw;                                    // optional
-        uint64_t last_message_id;                     // optional
-        int bitrate;                                  // optional
-        int user_limit;                               // optional
-        int rate_limit_per_user;                      // optional
-        std::vector<User> recipients;                 // optional
-        std::string icon;                             // optional
-        uint64_t owner_id;                            // optional
-        uint64_t application_id;                      // optional
-        bool managed;                                 // optional
-        uint64_t parent_id;                           // optional
-        std::string last_pin_timestamp;               // optional
-        std::string rtc_region;                       // optional
-        int video_quality_mode;                       // optional
-        int message_count;                            // optional
-        int member_count;                             // optional
-        ThreadMetadata thread_metadata;               // optional
-        ThreadMember member;                          // optional
-        int default_active_duration;                  // optional
-        std::string permissions;                      // optional
-        channelFlags flags;                           // optional
-        int total_message_sent;                       // optional (no, its not a typo, discord spelt it "message")
-        std::vector<uint64_t> applied_tags;           // optional
-        DefaultReaction default_reaction_emoji;       // optional
-        int default_thread_rate_limit_per_user;       // optional
-        int default_sort_order;                       // optional
-        int default_forum_layout;
+        std::optional<uint64_t> guild_id;
+        std::optional<int> position;
+        std::optional<std::vector<Overwrite>> permission_overwrites;
+        std::optional<std::string> name;
+        std::optional<std::string> topic;
+        std::optional<bool> nsfw;
+        std::optional<uint64_t> last_message_id;
+        std::optional<int> bitrate;
+        std::optional<int> user_limit;
+        std::optional<int> rate_limit_per_user;
+        std::optional<std::vector<User>> recipients;
+        std::optional<std::string> icon;
+        std::optional<uint64_t> owner_id;
+        std::optional<uint64_t> application_id;
+        std::optional<bool> managed;
+        std::optional<uint64_t> parent_id;
+        std::optional<std::string> last_pin_timestamp;
+        std::optional<std::string> rtc_region;
+        std::optional<int> video_quality_mode;
+        std::optional<int> message_count;
+        std::optional<int> member_count;
+        std::optional<ThreadMetadata> thread_metadata;
+        std::optional<ThreadMember> member;
+        std::optional<int> default_active_duration;
+        std::optional<std::string> permissions;
+        std::optional<channelFlags> flags;
+        std::optional<int> total_message_sent;
+        std::optional<std::vector<uint64_t>> applied_tags;
+        std::optional<DefaultReaction> default_reaction_emoji;
+        std::optional<int> default_sort_order;
+        std::optional<int> default_thread_rate_limit_per_user;
+        std::optional<int> default_forum_layout;
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Channel, id, type, guild_id, position, permission_overwrites, name,
+NC_JSON_DECLFUNCS(Channel, id, type, guild_id, position, permission_overwrites, name,
                                                 topic, nsfw, last_message_id, bitrate, user_limit, rate_limit_per_user,
                                                 recipients, icon, owner_id, application_id, managed, parent_id,
                                                 last_pin_timestamp, rtc_region, video_quality_mode, message_count,
