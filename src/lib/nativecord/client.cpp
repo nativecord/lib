@@ -52,9 +52,9 @@ NC_EXPORT bool nativecord::Client::connect()
     if (!nativecord::websockets::g_context)
         nativecord::websockets::createContext();
 
-    char* wss = reinterpret_cast<char*>(malloc(strlen(NC_WSS_URL)));
+    char* wss = reinterpret_cast<char*>(malloc(strlen(NC_WSS_URL) + 1));
     ASSERT(wss, "failed to allocate memory for wss uri");
-    memcpy(wss, NC_WSS_URL, strlen(NC_WSS_URL) + 1);
+    memcpy(wss, NC_WSS_URL, strlen(NC_WSS_URL));
     wss[strlen(NC_WSS_URL)] = '\0';
 
     lws_client_connect_info connInfo{};
