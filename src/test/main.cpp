@@ -1,72 +1,64 @@
 #include <nativecord/client.h>
 
-#include <nativecord/util/assert.h>
-
-#include <nativecord/objects/message.h>
+#include <nativecord/discord/objects/channel.h>
 
 #include <nlohmann/json.hpp>
 
-#include "util/log.h"
-
 #include <filesystem>
 #include <fstream>
+#include <stdexcept>
 
-#include <chrono>
+#include "util/log.h"
 
 int main(int /*argc*/, char* argv[])
 {
 #ifdef _WIN32
-    Log::SetupConsole();
+    Log::setupConsole();
 #endif
 
-    Log::Info("Parsing config file");
+    Log::info("Loading config");
     std::filesystem::path binPath = std::filesystem::absolute(std::filesystem::path(argv[0])).parent_path();
     std::string configPath(binPath.string() + "\\config.json");
+    if (!std::filesystem::exists(configPath))
+        throw new std::runtime_error("config.json does not exist");
+    std::ifstream configStream(configPath);
+    if (!configStream.is_open())
+        throw new std::runtime_error("failed to open config.json");
 
-    ASSERT(std::filesystem::exists(configPath), "config.json does not exist.");
-    std::ifstream config(configPath);
-    ASSERT(config.is_open(), "unable to open config.json");
-    nlohmann::json configjs = nlohmann::json::parse(config);
+    nlohmann::json config = nlohmann::json::parse(configStream);
 
-    ASSERT(configjs.contains("token"), "invalid config (missing token)");
+    std::string token;
+    if (!config.contains("token"))
+        throw new std::runtime_error("config does not have token");
+    config["token"].get_to(token);
 
-    std::string token = configjs["token"].get<std::string>();
+    nativecord::Client* client = new nativecord::Client();
+    client->setToken(token);
+    client->setIntents(INTENT_GUILDS | INTENT_GUILD_MESSAGES | INTENT_GUILD_MEMBERS);
 
-    nativecord::Client client;
-    client.setToken(token);
-    client.setIntents(INTENT_GUILDS | INTENT_GUILD_MESSAGES | INTENT_GUILD_MEMBERS);
-    ASSERT(client.connect(), "client failed to connect");
-
-    client.on("ready", [](nativecord::Client* client) {
-        Log::Info("Client is ready");
-        Log::Info("Logged in as {} | {}", client->getUser()->username, client->getUser()->id);
-
-        auto now = std::chrono::system_clock::now().time_since_epoch();
-
-        int currTime = static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(now).count());
-
-        Activity testActivity;
-        testActivity.type = ACTIVITY_WATCHING;
-        testActivity.name = "something";
-        testActivity.timestamps = {currTime, {}};
-        std::vector<Activity> activities;
-        activities.push_back(testActivity);
-
-        client->setPersona(STATUS_IDLE, &activities);
+    client->on("ready", [](nativecord::Client* client) {
+        Log::info("client is ready");
+        Log::info("Logged in as {} ({})", client->getUser()->username, client->getUser()->id);
     });
 
-    client.on("dispatch", [](nativecord::Client* client, lws*, nlohmann::json& js) {
+    client->on("dispatch", [](nativecord::Client* client, nlohmann::json& js) {
         std::string type = js["t"].get<std::string>();
-        Log::Verbose("{} received dispatch of type: {}", client->getUser()->username, type);
+        Log::info("received dispatch of type: {}", type);
+        if (type == "MESSAGE_CREATE")
+        {
+            std::string content = js["d"]["content"];
+            Log::info("content: {}", content);
+
+            if (content == "ping")
+            {
+                snowflake channelId = js["d"]["channel_id"].get<snowflake>();
+                auto TestChannel = new Channel(client, channelId);
+                TestChannel->sendMessage("pong !!");
+            }
+        }
     });
 
-    client.on("message", [](nativecord::Client* /*client*/, Message* msg) {
-        Log::Verbose("Client received message from {} : {}", msg->author.global_name, msg->content);
-    });
+    client->on("disconnect", [](uint16_t code) { Log::info("Client disconnected with code: {}", code); });
 
-    client.on("disconnect", [](uint16_t code) { Log::Info("Client disconnected with code: {}", code); });
-
-    nativecord::websockets::pollEvents();
-
-    return 0;
+    client->connect();
 }
