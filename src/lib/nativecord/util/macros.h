@@ -1,12 +1,6 @@
 #pragma once
 
 /*
-    helper macros
-*/
-#define STR_HELPER(x) #x
-#define STR(x) STR_HELPER(x)
-
-/*
     compiler specific macros
 */
 #ifdef _MSC_VER
@@ -36,7 +30,7 @@
 #endif
 
 /*
-    clang error fixes
+    helper macros
 */
-// under some circumstances [#a] makes clang detect stuff as objective-c
-#define _ADD_BRACKETS(a) [a]
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
