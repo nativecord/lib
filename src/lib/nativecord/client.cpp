@@ -149,10 +149,10 @@ std::unique_ptr<char[]> nativecord::Client::apiCall(const char* path, const char
 
     headers["Authorization"] = _token;
 
-    auto ret = nativecord::http::request(url.c_str(), method, reinterpret_cast<const char*>(data), dataSize, &headers);
+    std::unique_ptr<char[]> ret = nativecord::http::request(url.c_str(), method, reinterpret_cast<const char*>(data), dataSize, &headers);
     if (data)
         free(data);
-    return std::move(ret);
+    return ret;
 }
 
 void nativecord::Client::onGateway(lws* wsi, nlohmann::json& js)
@@ -181,6 +181,8 @@ void nativecord::Client::onGateway(lws* wsi, nlohmann::json& js)
                 identify(js);
                 break;
             }
+        default:
+            break;
     }
 }
 
