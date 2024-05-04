@@ -73,6 +73,7 @@ class Channel : ObjectBase
         Channel(nativecord::Client* client, snowflake channelId);
 
         void sendMessage(std::string content);
+        void sendMessage(class Message* msg);
 
         snowflake id;
         channelType type;
