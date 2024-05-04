@@ -1,6 +1,12 @@
 #pragma once
 
 /*
+    helper macros
+*/
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
+
+/*
     compiler specific macros
 */
 #ifdef _MSC_VER
@@ -28,9 +34,3 @@
     #define NC_WARNING_POP
     #define NC_DISABLE_WARNING(warningNumber)
 #endif
-
-/*
-    helper macros
-*/
-#define STR_HELPER(x) #x
-#define STR(x) STR_HELPER(x)
