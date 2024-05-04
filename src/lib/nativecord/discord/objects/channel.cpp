@@ -16,9 +16,7 @@ Channel::Channel(nativecord::Client* client, snowflake channelId)
 void Channel::sendMessage(std::string content)
 {
     nlohmann::json payload({{"content", content}});
-    auto res = _client->apiCall(std::format("channels/{}/messages", id).c_str(), "POST", &payload);
-    res;
-}    _client->apiCall(std::format("channels/{}/messages", id).c_str(), "POST", &payload);
+    _client->apiCall(std::format("channels/{}/messages", id).c_str(), "POST", &payload);
 }
 
 void Channel::sendMessage(Message* msg)
