@@ -126,7 +126,7 @@ lws_context* WebsocketConnection::createContext()
 
     lws_context_creation_info cci{};
 
-    lws_protocols prot[] = {{"ws", reinterpret_cast<lws_callback_function*>(wsCallback), 0, NC_MAX_WSS_PACKETSIZE, 0, this, 0}, {0, 0, 0, 0, 0, 0}};
+    lws_protocols prot[] = {{"ws", reinterpret_cast<lws_callback_function*>(wsCallback), 0, NC_MAX_WSS_PACKETSIZE, 0, this, 0}, {0, 0, 0, 0, 0, 0, 0}};
     static lws_extension ext[] = {{0, 0, 0}};
 
     cci.protocols = prot;
