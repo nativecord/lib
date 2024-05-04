@@ -1,9 +1,6 @@
 #pragma once
 
-#include "nativecord/util/jsonutils.h"
-
-#include <stdint.h>
-#include <string>
+#include "objects.h"
 
 enum userStatus
 {
@@ -13,14 +10,13 @@ enum userStatus
     STATUS_INVISIBLE,
     STATUS_OFFLINE
 };
-
 NLOHMANN_JSON_SERIALIZE_ENUM(userStatus, {
                                              {STATUS_ONLINE, "online"},
                                              {STATUS_DND, "dnd"},
                                              {STATUS_IDLE, "idle"},
                                              {STATUS_INVISIBLE, "invisible"},
                                              {STATUS_OFFLINE, "offline"},
-                                         })
+                                         });
 
 enum userFlags : int64_t
 {
@@ -49,25 +45,44 @@ enum userFlags : int64_t
     FLAG_ACTIVE_DEVELOPER = 1 << 22,
 };
 
-struct User
+class User : ObjectBase
 {
-        std::string id;
+    public:
+        snowflake id;
         std::string username;
         // std::string discriminator; // deprecated
-        std::string global_name;
-        bool bot;
-        bool system;
-        int premium_type;
-        userFlags public_flags;
-        std::string avatar;
-        std::string avatar_decoration;
-        std::string banner;
-        int accent_color;
-        userFlags flags;
-        bool mfa_enabled;
-        bool verified;
-        std::string email;
-        std::string locale;
+        std::optional<std::string> global_name;
+        std::optional<bool> bot;
+        std::optional<bool> system;
+        std::optional<int> premium_type;
+        std::optional<userFlags> public_flags;
+        std::optional<std::string> avatar;
+        std::optional<std::string> avatar_decoration;
+        std::optional<std::string> banner;
+        std::optional<int> accent_color;
+        std::optional<userFlags> flags;
+        std::optional<bool> mfa_enabled;
+        std::optional<bool> verified;
+        std::optional<std::string> email;
+        std::optional<std::string> locale;
 };
 NC_JSON_DECLFUNCS(User, id, username, global_name, bot, system, premium_type, public_flags, avatar, avatar_decoration,
-                  banner, accent_color, flags, mfa_enabled, verified, email, locale)
+                  banner, accent_color, flags, mfa_enabled, verified, email, locale);
+
+struct GuildMember
+{
+        std::optional<User> user;
+        std::optional<std::string> nick;
+        std::optional<std::string> avatar;
+        std::vector<uint64_t> roles;
+        std::string joined_at;
+        std::optional<std::string> premium_since;
+        bool deaf;
+        bool mute;
+        uint64_t flags;
+        std::optional<bool> pending;
+        std::optional<std::string> permissions;
+        std::optional<std::string> communication_disabled_until;
+};
+NC_JSON_DECLFUNCS(GuildMember, nick, avatar, roles, joined_at, premium_since, deaf, mute, flags, pending, permissions,
+                  communication_disabled_until);
