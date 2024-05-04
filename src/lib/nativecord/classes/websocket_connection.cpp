@@ -70,7 +70,7 @@ WebsocketConnection::WebsocketConnection(const char* uri, WebsocketCallbackFn cb
     if (lws_parse_uri(uriCopy, &connInfo.protocol, &connInfo.address, &connInfo.port, &connInfo.path))
     {
         free(uriCopy);
-        throw new std::exception("failed to parse uri");
+        throw new std::runtime_error("failed to parse uri");
     }
     connInfo.host = connInfo.address;
     connInfo.origin = connInfo.address;
