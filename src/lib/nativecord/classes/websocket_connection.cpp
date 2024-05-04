@@ -7,7 +7,7 @@
 
 std::vector<char> fragmentBuffer;
 
-int wsCallback(lws* wsi, lws_callback_reasons reason, void* user, void* in, size_t len)
+int wsCallback(lws* wsi, int reason, void* user, void* in, size_t len)
 {
     const lws_protocols* prot = lws_get_protocol(wsi);
 
@@ -49,6 +49,8 @@ int wsCallback(lws* wsi, lws_callback_reasons reason, void* user, void* in, size
         case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
         case LWS_CALLBACK_WS_PEER_INITIATED_CLOSE:
             conn->_shouldStop = true;
+            break;
+        default:
             break;
     }
 
@@ -103,7 +105,7 @@ void WebsocketConnection::pollEvents()
     lws_context_destroy(getContext());
 }
 
-int WebsocketConnection::invokeCallback(lws* wsi, lws_callback_reasons reason, void* user, void* in, size_t len)
+int WebsocketConnection::invokeCallback(lws* wsi, int reason, void* user, void* in, size_t len)
 {
     _wsi = wsi;
     int ret = _callback(wsi, reason, user, in, len);
@@ -124,7 +126,7 @@ lws_context* WebsocketConnection::createContext()
 
     lws_context_creation_info cci{};
 
-    lws_protocols prot[] = {{"ws", wsCallback, 0, NC_MAX_WSS_PACKETSIZE, 0, this}, {0, 0}};
+    lws_protocols prot[] = {{"ws", reinterpret_cast<lws_callback_function*>(wsCallback), 0, NC_MAX_WSS_PACKETSIZE, 0, this, 0}, {0, 0, 0, 0, 0, 0}};
     static lws_extension ext[] = {{0, 0, 0}};
 
     cci.protocols = prot;

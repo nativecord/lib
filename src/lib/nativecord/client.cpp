@@ -13,7 +13,7 @@
 
 #include <libwebsockets.h>
 
-int nativecord::_clientWsCallback(lws* wsi, lws_callback_reasons reason, void* user, void* in, size_t len)
+int nativecord::_clientWsCallback(lws* wsi, int reason, void* user, void* in, size_t len)
 {
     if (!user)
         return 0;
@@ -85,7 +85,7 @@ void nativecord::Client::connect()
     _ws->pollEvents();
 }
 
-int nativecord::Client::__wsReceive(lws* wsi, lws_callback_reasons reason, char* in, size_t /*len*/)
+int nativecord::Client::__wsReceive(lws* wsi, int reason, char* in, size_t /*len*/)
 {
     switch (reason)
     {
@@ -212,7 +212,7 @@ void nativecord::Client::identify(nlohmann::json& js)
                          {"intents", _intents},
                          {"compress", false},
                          {"large_treshold", 250},
-                         {"properties", {{"$os", "Windows"}, {"$browser", "Chrome"}}}});
+                         {"properties", {{"os", "Windows"}, {"browser", "Chrome"}}}});
     id["d"] = data;
 
     wsSendJson(id);
