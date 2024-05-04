@@ -1,72 +1,93 @@
 #pragma once
 
-#include "gateway.h"
-
-#include "util/events.h"
-#include "util/macros.h"
-
-#include "objects/activity.h"
-#include "objects/user.h"
-
+#include <memory>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 #include <nlohmann/json.hpp>
 
-struct lws;
+#include "nativecord/classes/cache.h"
 
+#include "nativecord/classes/events.h"
+#include "nativecord/util/macros.h"
+
+#include "nativecord/discord/enums/intents.h"
+#include "nativecord/discord/objects/user.h"
+
+class WebsocketConnection;
+
+struct lws;
+struct lws_context;
 NC_WARNING_PUSH
 NC_DISABLE_WARNING(4471)
 enum lws_callback_reasons;
 NC_WARNING_POP
 
+class Guild;
+class User;
+
+/*
+    TO-DO:
+        dynamically figure these out
+*/
+#define NC_DEFAULT_GUILD_CACHE_SIZE 250
+#define NC_DEFAULT_USER_CACHE_SIZE 250
+
 namespace nativecord
 {
+    int _clientWsCallback(lws* wsi, lws_callback_reasons reason, void* user, void* in, size_t len);
     class Client
     {
         public:
-            NC_EXPORT Client(std::string token = "");
+            Client(std::string token = "");
+            ~Client();
 
-            NC_EXPORT inline void setToken(std::string token);
-            NC_EXPORT inline std::string getToken() const;
+            inline void setToken(std::string token) { _token = token; }
+            inline std::string getToken() const { return _token; }
 
-            NC_EXPORT inline void setIntents(int intents);
-            NC_EXPORT inline int getIntents() const;
+            inline void setIntents(clientIntents val) { _intents = val; };
+            inline clientIntents getIntents() const { return _intents; };
 
-            NC_EXPORT inline const User* getUser() const;
+            inline const User* getUser() const { return &_user; };
 
-            NC_EXPORT void setPersona(userStatus status, std::vector<Activity>* activities = {});
+            // void setPersona(userStatus status, std::vector<Activity>* activities = {});
 
-            NC_EXPORT void connect();
+            void connect();
 
-            void gatewayHandler(lws* wsi, char* in);
-            int websocketHandler(lws* wsi, lws_callback_reasons reason, char* in, size_t len);
+            template <typename Func> inline void on(std::string eventName, Func func) { _emitter.on(eventName, func); }
 
-            template <typename Func> inline void NC_EXPORT on(std::string eventName, Func func)
-            {
-                _emitter.on(eventName, func);
-            }
+            int __wsReceive(lws* wsi, lws_callback_reasons reason, char* in, size_t len);
 
-            NC_EXPORT static void pollEvents();
+            Cache<snowflake, Guild>* getGuildCache() const { return _guildCache; }
+            Cache<snowflake, User>* getUserCache() const { return _userCache; }
+
+            std::unique_ptr<char[]> apiCall(const char* path, const char* method, nlohmann::json* payload = nullptr);
 
         private:
+            friend int _clientWsCallback(lws* wsi, lws_callback_reasons reason, void* user, void* in, size_t len);
+
+            void onGateway(lws* wsi, nlohmann::json& js);
+
+            void wsSendJson(nlohmann::json& js);
+
             void identify(nlohmann::json& js);
             void registerEvents();
 
-            void sendJson(nlohmann::json& js);
-
             std::unordered_map<std::string, void (*)(Client* client, lws* wsi, nlohmann::json& js)> _dispatchListeners;
+
             EventEmitter _emitter;
 
             std::string _token;
-            int _intents = -1;
+            clientIntents _intents;
 
-            int _lastSeq = -1;
-            int _heartbeatInterval = -1;
+            int _lastSequence;
+            int _heartbeatInterval;
+
+            WebsocketConnection* _ws;
+
+            Cache<snowflake, Guild>* _guildCache;
+            Cache<snowflake, User>* _userCache;
 
             User _user;
-
-            lws* _wsi;
     };
 }
