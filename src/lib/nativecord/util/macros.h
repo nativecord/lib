@@ -19,8 +19,7 @@
         #define NC_EXPORT __attribute__((dllexport))
     #endif
     #define NC_NORET [[noreturn]]
-
 #else
     #define NC_EXPORT
-    #define NC_NORET
+    #define NC_NORET [[noreturn]]
 #endif
