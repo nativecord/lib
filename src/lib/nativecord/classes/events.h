@@ -32,16 +32,13 @@ struct EventInfo
 class EventEmitter
 {
     private:
-        template <typename... T> std::vector<size_t> getTypeHashCodes()
-        {
-            return {typeid(T).hash_code()...};
-        }
+        template <typename... T> std::vector<size_t> getTypeHashCodes() { return {typeid(T).hash_code()...}; }
 
         template <typename Tuple, size_t Index = 0> void getTupleTypeHashCodes(std::vector<size_t>* hashList)
         {
             if constexpr (Index < std::tuple_size_v<Tuple>)
             {
-                hashList->push_back(typeid(std::tuple_element<Index, Tuple>::type).hash_code());
+                hashList->push_back(typeid(typename std::tuple_element<Index, Tuple>::type).hash_code());
                 getTupleTypeHashCodes<Tuple, Index + 1>(hashList);
             }
         }
@@ -89,7 +86,7 @@ class EventEmitter
             if (eventInfo->_types != listenerArgHashes)
                 throw new std::logic_error("listener function signature does not match event");
 
-            eventInfo->_listeners.push_back(listenerFn);
+            eventInfo->_listeners.push_back(reinterpret_cast<void*>(+listenerFn));
         }
 
     private:
