@@ -1,7 +1,12 @@
 #pragma once
 
-#include <format>
 #include <string>
+#include <format>
+
+/*
+    TO-DO:
+        add subscriptions, log levels, dynamic types
+*/
 
 /*
     Log types represented in enums, strings and their prefix colours
@@ -20,7 +25,7 @@ inline const char* logTypeColors[]{"\x1b[34;40m", "\x1b[32;40m", "\x1b[30;43m", 
 #define DECL_LOGGER(NAME, TYPE)                                                                                        \
     template <typename... Args> inline void NAME(const std::format_string<Args...> fmt, Args&&... args)                \
     {                                                                                                                  \
-        Write(TYPE, std::vformat(fmt.get(), std::make_format_args(args...)));                                          \
+        write(TYPE, std::vformat(fmt.get(), std::make_format_args(args...)));                                          \
     }
 
 namespace Log
@@ -29,25 +34,21 @@ namespace Log
     /*
         Helper function that enables ANSI escape sequences for colours
     */
-    void SetupConsole();
+    void setupConsole();
 #endif
 
     /*
         Prints log to console
     */
-    void Write(LogType type, std::string message);
+    void write(LogType type, std::string message);
 
     /*
         Logger functions for each type
     */
-    DECL_LOGGER(Info, LOG_INFO);
-    DECL_LOGGER(Warning, LOG_WARNING);
-    DECL_LOGGER(Error, LOG_ERROR);
-    DECL_LOGGER(Client, LOG_CLIENT);
+    DECL_LOGGER(info, LOG_INFO);
+    DECL_LOGGER(warning, LOG_WARNING);
+    DECL_LOGGER(error, LOG_ERROR);
+    DECL_LOGGER(client, LOG_CLIENT);
+    DECL_LOGGER(verbose, LOG_VERBOSE);
 
-#ifdef _DEBUG
-    DECL_LOGGER(Verbose, LOG_VERBOSE);
-#else
-    #define LogVerbose(...)
-#endif
 }
