@@ -1,18 +1,10 @@
 #pragma once
 
-#include "nativecord/util/jsonutils.h"
+#include "objects.h"
 
-#include "nativecord/objects/guild.h"
-#include "nativecord/objects/message.h"
-#include "nativecord/objects/misc.h"
-#include "nativecord/objects/user.h"
+#include "user.h"
 
-#include <optional>
-#include <stdint.h>
-#include <string>
-#include <vector>
-
-enum channelType : int
+enum channelType : int32_t
 {
     CHANNELTYPE_GUILD_TEXT,
     CHANNELTYPE_DM,
@@ -38,7 +30,6 @@ enum channelFlags
 
 struct ThreadMetadata
 {
-    public:
         bool archived;
         int auto_archive_duration;
         std::string archive_timestamp;
@@ -46,49 +37,62 @@ struct ThreadMetadata
         std::optional<bool> invitable;
         std::optional<std::string> create_timestamp;
 };
-NC_JSON_DECLFUNCS(ThreadMetadata, archived, auto_archive_duration, archive_timestamp,
-                                                locked, invitable, create_timestamp);
+NC_JSON_DECLFUNCS(ThreadMetadata, archived, auto_archive_duration, archive_timestamp, locked, invitable,
+                  create_timestamp);
 
 struct ThreadMember
 {
-    public:
-        std::optional<uint64_t> id;
-        uint64_t user_id;
+        std::optional<snowflake> id;
+        snowflake user_id;
         std::optional<std::string> join_timestamp;
-        int flags;                  // ?
+        int flags;
         std::optional<GuildMember> member;
 };
 NC_JSON_DECLFUNCS(ThreadMember, id, user_id, join_timestamp, flags, member);
 
 struct DefaultReaction
 {
-    public:
-        std::optional<uint64_t> emoji_id;
+        std::optional<snowflake> emoji_id;
         std::optional<std::string> emoji_name;
 };
 NC_JSON_DECLFUNCS(DefaultReaction, emoji_id, emoji_name);
 
-struct Channel
+struct Overwrite
+{
+        snowflake id;
+        int type;
+        std::string allow;
+        std::string deny;
+};
+NC_JSON_DECLFUNCS(Overwrite, id, type, allow, deny);
+
+class Channel : ObjectBase
 {
     public:
-        uint64_t id;
+        using ObjectBase::ObjectBase;
+        Channel(nativecord::Client* client, snowflake channelId);
+
+        void sendMessage(std::string content);
+
+        snowflake id;
         channelType type;
-        std::optional<uint64_t> guild_id;
+
+        std::optional<snowflake> guild_id;
         std::optional<int> position;
         std::optional<std::vector<Overwrite>> permission_overwrites;
         std::optional<std::string> name;
         std::optional<std::string> topic;
         std::optional<bool> nsfw;
-        std::optional<uint64_t> last_message_id;
+        std::optional<snowflake> last_message_id;
         std::optional<int> bitrate;
         std::optional<int> user_limit;
         std::optional<int> rate_limit_per_user;
         std::optional<std::vector<User>> recipients;
         std::optional<std::string> icon;
-        std::optional<uint64_t> owner_id;
-        std::optional<uint64_t> application_id;
+        std::optional<snowflake> owner_id;
+        std::optional<snowflake> application_id;
         std::optional<bool> managed;
-        std::optional<uint64_t> parent_id;
+        std::optional<snowflake> parent_id;
         std::optional<std::string> last_pin_timestamp;
         std::optional<std::string> rtc_region;
         std::optional<int> video_quality_mode;
@@ -106,11 +110,9 @@ struct Channel
         std::optional<int> default_thread_rate_limit_per_user;
         std::optional<int> default_forum_layout;
 };
-NC_JSON_DECLFUNCS(Channel, id, type, guild_id, position, permission_overwrites, name,
-                                                topic, nsfw, last_message_id, bitrate, user_limit, rate_limit_per_user,
-                                                recipients, icon, owner_id, application_id, managed, parent_id,
-                                                last_pin_timestamp, rtc_region, video_quality_mode, message_count,
-                                                member_count, thread_metadata, member, default_active_duration,
-                                                permissions, flags, total_message_sent, applied_tags,
-                                                default_thread_rate_limit_per_user, default_sort_order,
-                                                default_forum_layout);
+NC_JSON_DECLFUNCS(Channel, id, type, guild_id, position, permission_overwrites, name, topic, nsfw, last_message_id,
+                  bitrate, user_limit, rate_limit_per_user, recipients, icon, owner_id, application_id, managed,
+                  parent_id, last_pin_timestamp, rtc_region, video_quality_mode, message_count, member_count,
+                  thread_metadata, member, default_active_duration, permissions, flags, total_message_sent,
+                  applied_tags, default_reaction_emoji, default_sort_order, default_thread_rate_limit_per_user,
+                  default_forum_layout);
