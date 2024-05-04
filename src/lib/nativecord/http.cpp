@@ -1,8 +1,11 @@
 #include "http.h"
 
+#include "nativecord/util/macros.h"
+
 #include <libwebsockets.h>
 
 #include <stdexcept>
+#include <vector>
 
 lws_context* context;
 
@@ -20,6 +23,14 @@ struct requestInfo
         bool _err;
 };
 
+#define HTTP_ERROR_IF(cond)                                                                                            \
+    if (cond)                                                                                                          \
+    {                                                                                                                  \
+        req->_err = true;                                                                                              \
+        lws_cancel_service(lws_get_context(wsi));                                                                      \
+        return -1;                                                                                                     \
+    }
+
 int httpCallback(lws* wsi, lws_callback_reasons reason, void* user, void* in, size_t len)
 {
     if (!user)
@@ -34,14 +45,21 @@ int httpCallback(lws* wsi, lws_callback_reasons reason, void* user, void* in, si
                 unsigned char** start = reinterpret_cast<unsigned char**>(in);
                 unsigned char* end = *start + len - 1;
 
-                lws_add_http_header_by_token(wsi, WSI_TOKEN_HTTP_USER_AGENT,
-                                             reinterpret_cast<const unsigned char*>(NC_USERAGENT),
-                                             static_cast<int>(strlen(NC_USERAGENT)), start, end);
+                int headerResult = 0;
+                headerResult = lws_add_http_header_by_token(wsi, WSI_TOKEN_HTTP_USER_AGENT,
+                                                            reinterpret_cast<const unsigned char*>(NC_USERAGENT),
+                                                            static_cast<int>(strlen(NC_USERAGENT)), start, end);
+
+                HTTP_ERROR_IF(headerResult)
 
                 for (auto header : req->_headers)
-                    lws_add_http_header_by_name(wsi, reinterpret_cast<const unsigned char*>(header.first.c_str()),
-                                                reinterpret_cast<const unsigned char*>(header.second.c_str()),
-                                                static_cast<int>(header.second.length()), start, end);
+                {
+                    headerResult =
+                        lws_add_http_header_by_name(wsi, reinterpret_cast<const unsigned char*>(header.first.c_str()),
+                                                    reinterpret_cast<const unsigned char*>(header.second.c_str()),
+                                                    static_cast<int>(header.second.length()), start, end);
+                    HTTP_ERROR_IF(headerResult)
+                }
 
                 if (lws_http_is_redirected_to_get(wsi))
                     break;
@@ -49,13 +67,15 @@ int httpCallback(lws* wsi, lws_callback_reasons reason, void* user, void* in, si
                 if (req->_send != nullptr && req->_sendSize > 0)
                 {
                     char lengthBuffer[20];
-                    sprintf_s(lengthBuffer, "%zu", req->_sendSize);
+                    snprintf(lengthBuffer, 20, "%zu", req->_sendSize);
 
                     // so much casting...
-                    lws_add_http_header_by_token(
+                    headerResult = lws_add_http_header_by_token(
                         wsi, WSI_TOKEN_HTTP_CONTENT_LENGTH,
                         reinterpret_cast<const unsigned char*>(const_cast<const char*>(lengthBuffer)),
                         static_cast<int>(strlen(lengthBuffer)), start, end);
+
+                    HTTP_ERROR_IF(headerResult)
 
                     lws_client_http_body_pending(wsi, 1);
                     lws_callback_on_writable(wsi);
@@ -69,24 +89,14 @@ int httpCallback(lws* wsi, lws_callback_reasons reason, void* user, void* in, si
 
                 size_t size = req->_sendSize;
                 unsigned char* writeBuff = reinterpret_cast<unsigned char*>(malloc(LWS_PRE + size));
-                if (!writeBuff)
-                {
-                    req->_err = true;
-                    lws_cancel_service(lws_get_context(wsi));
-                    return -1;
-                }
+                HTTP_ERROR_IF(!writeBuff)
                 auto start = writeBuff + LWS_PRE;
                 memcpy(start, req->_send, size);
 
                 int res = lws_write(wsi, start, size, LWS_WRITE_HTTP);
                 free(writeBuff);
 
-                if (res < 0 || res < size)
-                {
-                    req->_err = true;
-                    lws_cancel_service(lws_get_context(wsi));
-                    return -1;
-                }
+                HTTP_ERROR_IF(res < 0 || res < static_cast<int>(size))
 
                 lws_client_http_body_pending(wsi, 0);
 
@@ -102,12 +112,8 @@ int httpCallback(lws* wsi, lws_callback_reasons reason, void* user, void* in, si
         case LWS_CALLBACK_RECEIVE_CLIENT_HTTP:
             {
                 char* buf = reinterpret_cast<char*>(malloc(LWS_PRE + NC_HTTP_BUFFSIZE));
-                if (!buf)
-                {
-                    req->_err = true;
-                    lws_cancel_service(lws_get_context(wsi));
-                    return -1;
-                }
+                HTTP_ERROR_IF(!buf)
+
                 char* cur = buf + LWS_PRE;
                 int bufLen = NC_HTTP_BUFFSIZE;
                 if (lws_http_client_read(wsi, &cur, &bufLen) < 0)
@@ -115,6 +121,7 @@ int httpCallback(lws* wsi, lws_callback_reasons reason, void* user, void* in, si
 
                     req->_err = true;
                     lws_cancel_service(lws_get_context(wsi));
+                    free(buf);
                     return -1;
                 }
                 free(buf);
@@ -131,6 +138,8 @@ int httpCallback(lws* wsi, lws_callback_reasons reason, void* user, void* in, si
             req->_err = true;
             lws_cancel_service(lws_get_context(wsi));
             return -1;
+        default:
+            break;
     }
 
     return lws_callback_http_dummy(wsi, reason, user, in, len);
@@ -185,7 +194,7 @@ std::unique_ptr<char[]> nativecord::http::request(const char* url, const char* m
     if (lws_parse_uri(urlCopy, &connInfo.protocol, &connInfo.address, &connInfo.port, &connInfo.path))
     {
         free(urlCopy);
-        throw new std::exception("failed to parse uri");
+        throw new std::runtime_error("failed to parse uri");
     }
 
     lws* wsi;
@@ -217,5 +226,5 @@ std::unique_ptr<char[]> nativecord::http::request(const char* url, const char* m
     auto recvBuffer = std::unique_ptr<char[]>(new char[recvSize + 1]);
     memcpy(recvBuffer.get(), req._recv.data(), recvSize);
 
-    return std::move(recvBuffer);
+    return recvBuffer;
 }
