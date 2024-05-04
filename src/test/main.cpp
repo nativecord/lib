@@ -1,6 +1,7 @@
 #include <nativecord/client.h>
 
 #include <nativecord/discord/objects/channel.h>
+#include <nativecord/discord/objects/message.h>
 
 #include <nlohmann/json.hpp>
 
@@ -10,6 +11,13 @@
 
 #include "util/log.h"
 
+#define ASSERT(cond, msg)                                                                                              \
+    if (!(cond))                                                                                                       \
+    {                                                                                                                  \
+        Log::error(msg);                                                                                               \
+        return -1;                                                                                                     \
+    }
+
 int main(int /*argc*/, char* argv[])
 {
 #ifdef _WIN32
@@ -18,18 +26,18 @@ int main(int /*argc*/, char* argv[])
 
     Log::info("Loading config");
     std::filesystem::path binPath = std::filesystem::absolute(std::filesystem::path(argv[0])).parent_path();
-    std::string configPath(binPath.string() + "\\config.json");
-    if (!std::filesystem::exists(configPath))
-        throw new std::runtime_error("config.json does not exist");
+    std::filesystem::path configPath(binPath.string());
+    configPath /= "config.json";
+    //std::string configPath(binPath.string() + "/config.json");
+    ASSERT(std::filesystem::exists(configPath), "config.json does not exist");
+
     std::ifstream configStream(configPath);
-    if (!configStream.is_open())
-        throw new std::runtime_error("failed to open config.json");
+    ASSERT(configStream.is_open(), "failed to open config.json");
 
     nlohmann::json config = nlohmann::json::parse(configStream);
 
     std::string token;
-    if (!config.contains("token"))
-        throw new std::runtime_error("config does not have token");
+    ASSERT(config.contains("token"), "invalid config (missing token)");
     config["token"].get_to(token);
 
     nativecord::Client* client = new nativecord::Client();
@@ -46,14 +54,21 @@ int main(int /*argc*/, char* argv[])
         Log::info("received dispatch of type: {}", type);
         if (type == "MESSAGE_CREATE")
         {
-            std::string content = js["d"]["content"];
-            Log::info("content: {}", content);
+            Message msg = js["d"];
+            if (msg.author.value().id == client->getUser()->id)
+                return;
 
-            if (content == "ping")
+            if (msg.content == "hi")
             {
                 snowflake channelId = js["d"]["channel_id"].get<snowflake>();
                 auto TestChannel = new Channel(client, channelId);
-                TestChannel->sendMessage("pong !!");
+
+                Message reply{};
+                reply.content = "hello";
+                reply.message_reference =
+                    std::make_optional<MessageReference>({msg.id, std::nullopt, std::nullopt, std::nullopt});
+
+                TestChannel->sendMessage(&reply);
             }
         }
     });
