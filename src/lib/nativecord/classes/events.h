@@ -67,7 +67,6 @@ class EventEmitter
             if (argTypes != eventInfo->_types)
                 throw new std::logic_error("event args do not match args passed to fireEvent");
 
-            using FunctionType = std::function<void(Args...)>;
             for (auto functionPointer : eventInfo->_listeners)
             {
                 auto fn = reinterpret_cast<void (*)(Args...)>(functionPointer);
