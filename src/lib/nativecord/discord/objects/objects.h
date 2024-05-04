@@ -54,7 +54,7 @@ template <class T, class J> inline void optionalFromJson(J& j, const char* name,
 {
     const auto it = j.find(name);
     if (it != j.end())
-        value = it->get<T>();
+        value = it->template get<T>();
     else
         value = std::nullopt;
 }

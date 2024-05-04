@@ -1,6 +1,6 @@
 #pragma once
 
-#include "util/macros.h"
+#include "nativecord/util/macros.h"
 
 #define NC_DISCORD "https://discord.com"
 
