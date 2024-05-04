@@ -1,4 +1,5 @@
 #include "channel.h"
+#include "message.h"
 
 #include "nativecord/client.h"
 
@@ -17,4 +18,11 @@ void Channel::sendMessage(std::string content)
     nlohmann::json payload({{"content", content}});
     auto res = _client->apiCall(std::format("channels/{}/messages", id).c_str(), "POST", &payload);
     res;
+}    _client->apiCall(std::format("channels/{}/messages", id).c_str(), "POST", &payload);
+}
+
+void Channel::sendMessage(Message* msg)
+{
+    nlohmann::json msgPayload(*msg);
+    _client->apiCall(std::format("channels/{}/messages", id).c_str(), "POST", &msgPayload);
 }
