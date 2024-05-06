@@ -5,6 +5,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include <chrono>
 #include <filesystem>
 #include <fstream>
 #include <stdexcept>
@@ -28,7 +29,6 @@ int main(int /*argc*/, char* argv[])
     std::filesystem::path binPath = std::filesystem::absolute(std::filesystem::path(argv[0])).parent_path();
     std::filesystem::path configPath(binPath.string());
     configPath /= "config.json";
-    //std::string configPath(binPath.string() + "/config.json");
     ASSERT(std::filesystem::exists(configPath), "config.json does not exist");
 
     std::ifstream configStream(configPath);
@@ -73,7 +73,19 @@ int main(int /*argc*/, char* argv[])
         }
     });
 
-    client->on("disconnect", [](uint16_t code) { Log::info("Client disconnected with code: {}", code); });
+    client->on("disconnect",
+               [](nativecord::Client*, int reason) { Log::info("Client disconnected with reason: {}", reason); });
 
     client->connect();
+
+    std::string in;
+    while (std::getline(std::cin, in))
+    {
+        if (in == "stop")
+        {
+            break;
+        }
+    }
+
+    return 0;
 }

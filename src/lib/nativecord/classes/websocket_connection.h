@@ -2,6 +2,9 @@
 
 #include <stddef.h>
 
+#include <hv/WebSocketClient.h>
+
+#include "nativecord/classes/events.h"
 
 /*
     TO-DO:
@@ -9,32 +12,20 @@
 */
 #define NC_MAX_WSS_PACKETSIZE 4096
 
-struct lws;
-struct lws_context;
-
-typedef int (*WebsocketCallbackFn)(lws*, int, void*, void*, size_t);
-
-class WebsocketConnection
+class WebsocketConnection : public hv::WebSocketClient
 {
     public:
         WebsocketConnection() = delete;
-        WebsocketConnection(const char* uri, WebsocketCallbackFn cb, void* user = nullptr);
+        WebsocketConnection(const char* uri, void* user = nullptr, hv::EventLoopPtr loop = NULL);
         ~WebsocketConnection();
 
-        void pollEvents();
-        int invokeCallback(lws* wsi, int reason, void* user, void* in, size_t len);
+        int connect();
+        void* getUserData();
 
-        lws* getInterface();
-
+        template <typename Func> inline void on(std::string eventName, Func func) { _emitter.on(eventName, func); }
     private:
-        friend int wsCallback(lws*, int, void*, void*, size_t);
-        int (*_callback)(lws*, int, void*, void*, size_t);
-
-        lws_context* createContext();
-        lws_context* getContext();
-
-        bool _shouldStop = false;
-
-        lws* _wsi;
-        lws_context* _context;
+        char* _uri;
+        void* _user;
+        
+        EventEmitter _emitter;
 };

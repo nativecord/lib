@@ -43,10 +43,12 @@ else()
 endif()
 
 target_include_directories(nativecord-lib PUBLIC "src/lib")
-target_link_libraries(
-  nativecord-lib PRIVATE nativecord-warnings websockets
-                         ${LIBWEBSOCKETS_DEP_LIBS} nlohmann_json)
+target_link_libraries(nativecord-lib PRIVATE nativecord-warnings nlohmann_json)
+target_link_libraries(nativecord-lib PUBLIC hv)
 set_target_properties(nativecord-lib PROPERTIES USE_FOLDERS ON)
+
+# libhv copy
+add_custom_command(TARGET nativecord-lib POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:hv> $<TARGET_FILE_DIR:nativecord-lib>)
 
 # ---------------------
 # test project

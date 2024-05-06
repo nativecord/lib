@@ -1,3 +1,6 @@
 [submodule "vendor/json"]
 	path = vendor/json
 	url = https://github.com/nlohmann/json
+[submodule "vendor/libhv"]
+	path = vendor/libhv
+	url = https://github.com/ithewei/libhv

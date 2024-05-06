@@ -8,17 +8,15 @@
 
 #include "nativecord/classes/cache.h"
 #include "nativecord/classes/events.h"
+#include "nativecord/classes/websocket_connection.h"
 
 #include "nativecord/util/macros.h"
 
 #include "nativecord/discord/enums/intents.h"
+#include "nativecord/discord/objects/guild.h"
 #include "nativecord/discord/objects/user.h"
 
-class WebsocketConnection;
-class Guild;
-class User;
-
-struct lws;
+#include <hv/httpdef.h>
 
 /*
     TO-DO:
@@ -29,7 +27,6 @@ struct lws;
 
 namespace nativecord
 {
-    int _clientWsCallback(lws* wsi, int reason, void* user, void* in, size_t len);
     class Client
     {
         public:
@@ -46,28 +43,27 @@ namespace nativecord
 
             // void setPersona(userStatus status, std::vector<Activity>* activities = {});
 
-            NC_EXPORT void connect();
+            NC_EXPORT int connect();
 
             template <typename Func> inline void on(std::string eventName, Func func) { _emitter.on(eventName, func); }
-
-            int __wsReceive(lws* wsi, int reason, char* in, size_t len);
 
             Cache<snowflake, Guild>* getGuildCache() const { return _guildCache; }
             Cache<snowflake, User>* getUserCache() const { return _userCache; }
 
-            std::unique_ptr<char[]> apiCall(const char* path, const char* method, nlohmann::json* payload = nullptr);
+            std::pair<int, std::string> apiCall(const char* path, http_method method,
+                                                nlohmann::json* payload = nullptr);
 
+            void __processReceive(const std::string& msg);
+
+            inline bool isConnected() const { return _connected; };
         private:
-            friend int _clientWsCallback(lws* wsi, int reason, void* user, void* in, size_t len);
-
-            void onGateway(lws* wsi, char* in);
-
-            void wsSendJson(nlohmann::json& js);
+            void sendHeartbeat();
+            void sendJson(nlohmann::json& js);
 
             void identify(nlohmann::json& js);
             void registerEvents();
 
-            std::unordered_map<std::string, void (*)(Client* client, lws* wsi, nlohmann::json& js)> _dispatchListeners;
+            std::unordered_map<std::string, void (*)(Client* client, nlohmann::json& js)> _dispatchListeners;
 
             EventEmitter _emitter;
 
@@ -75,7 +71,7 @@ namespace nativecord
             clientIntents _intents;
 
             int _lastSequence;
-            int _heartbeatInterval;
+            bool _connected = false;
 
             WebsocketConnection* _ws;
 
