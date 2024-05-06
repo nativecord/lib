@@ -47,7 +47,6 @@ target_link_libraries(
   nativecord-lib PRIVATE nativecord-warnings websockets
                          ${LIBWEBSOCKETS_DEP_LIBS} nlohmann_json)
 set_target_properties(nativecord-lib PROPERTIES USE_FOLDERS ON)
-endif()
 
 # ---------------------
 # test project
