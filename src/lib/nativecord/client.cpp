@@ -91,8 +91,7 @@ int nativecord::Client::__wsReceive(lws* wsi, int reason, char* in, size_t /*len
     {
         case LWS_CALLBACK_CLIENT_RECEIVE:
             {
-                nlohmann::json js = nlohmann::json::parse(in);
-                this->onGateway(wsi, js);
+                this->onGateway(wsi, in);
                 break;
             }
         case LWS_CALLBACK_TIMER:
@@ -144,19 +143,20 @@ std::unique_ptr<char[]> nativecord::Client::apiCall(const char* path, const char
         reinterpret_cast<char*>(data)[dataSize] = '\0';
 
         headers["Content-Type"] = "application/json";
-
     }
 
     headers["Authorization"] = _token;
 
-    std::unique_ptr<char[]> ret = nativecord::http::request(url.c_str(), method, reinterpret_cast<const char*>(data), dataSize, &headers);
+    std::unique_ptr<char[]> ret =
+        nativecord::http::request(url.c_str(), method, reinterpret_cast<const char*>(data), dataSize, &headers);
     if (data)
         free(data);
     return ret;
 }
 
-void nativecord::Client::onGateway(lws* wsi, nlohmann::json& js)
+void nativecord::Client::onGateway(lws* wsi, char* in)
 {
+    nlohmann::json js = nlohmann::json::parse(in);
     if (js.contains("s") && !js["s"].is_null())
         js["s"].get_to(_lastSequence);
 

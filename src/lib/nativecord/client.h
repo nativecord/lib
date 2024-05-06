@@ -60,7 +60,7 @@ namespace nativecord
         private:
             friend int _clientWsCallback(lws* wsi, int reason, void* user, void* in, size_t len);
 
-            void onGateway(lws* wsi, nlohmann::json& js);
+            void onGateway(lws* wsi, char* in);
 
             void wsSendJson(nlohmann::json& js);
 
