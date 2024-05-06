@@ -87,5 +87,5 @@ class Guild : public ObjectBase
     private:
         Cache<snowflake, class Channel>* _channelCache;
 };
-void to_json(nlohmann::json& nlohmann_json_j, const Guild& nlohmann_json_t);
-void from_json(const nlohmann::json& nlohmann_json_j, Guild& nlohmann_json_t);
+NC_EXPORT void to_json(nlohmann::json& nlohmann_json_j, const Guild& nlohmann_json_t);
+NC_EXPORT void from_json(const nlohmann::json& nlohmann_json_j, Guild& nlohmann_json_t);

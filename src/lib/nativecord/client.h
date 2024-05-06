@@ -33,8 +33,8 @@ namespace nativecord
     class Client
     {
         public:
-            Client(std::string token = "");
-            ~Client();
+            NC_EXPORT Client(std::string token = "");
+            NC_EXPORT ~Client();
 
             inline void setToken(std::string token) { _token = token; }
             inline std::string getToken() const { return _token; }
@@ -46,7 +46,7 @@ namespace nativecord
 
             // void setPersona(userStatus status, std::vector<Activity>* activities = {});
 
-            void connect();
+            NC_EXPORT void connect();
 
             template <typename Func> inline void on(std::string eventName, Func func) { _emitter.on(eventName, func); }
 

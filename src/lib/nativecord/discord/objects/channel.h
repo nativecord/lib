@@ -70,10 +70,10 @@ class Channel : ObjectBase
 {
     public:
         using ObjectBase::ObjectBase;
-        Channel(nativecord::Client* client, snowflake channelId);
+        NC_EXPORT Channel(nativecord::Client* client, snowflake channelId);
 
-        void sendMessage(std::string content);
-        void sendMessage(class Message* msg);
+        NC_EXPORT void sendMessage(std::string content);
+        NC_EXPORT void sendMessage(class Message* msg);
 
         snowflake id;
         channelType type;

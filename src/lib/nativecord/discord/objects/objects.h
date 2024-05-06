@@ -19,8 +19,8 @@ namespace nativecord
 class ObjectBase
 {
     public:
-        ObjectBase() : _client(nullptr){};
-        ObjectBase(nativecord::Client* client) : _client(client){};
+        NC_EXPORT ObjectBase() : _client(nullptr){};
+        NC_EXPORT ObjectBase(nativecord::Client* client) : _client(client){};
 
         inline nativecord::Client* getClient() { return _client; }
 

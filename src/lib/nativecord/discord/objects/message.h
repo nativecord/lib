@@ -104,8 +104,8 @@ NC_JSON_DECLFUNCS(StickerItem, id, name, format_type);
 class Message
 {
     public:
-        Message();
-        ~Message();
+        NC_EXPORT Message();
+        NC_EXPORT ~Message();
 
         std::optional<snowflake> id; // always received, not sent
         std::optional<snowflake> channel_id; // always received, not sent
@@ -142,5 +142,5 @@ class Message
         //std::optional<PollCreateRequest> poll;
 };
 
-void to_json(nlohmann::json& nlohmann_json_j, const Message& nlohmann_json_t);
-void from_json(const nlohmann::json& nlohmann_json_j, Message& nlohmann_json_t);
+NC_EXPORT void to_json(nlohmann::json& nlohmann_json_j, const Message& nlohmann_json_t);
+NC_EXPORT void from_json(const nlohmann::json& nlohmann_json_j, Message& nlohmann_json_t);
