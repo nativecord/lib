@@ -1,20 +1,4 @@
 # ---------------------
-# libwebsockets
-# ---------------------
-set(LWS_WITH_MINIMAL_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(LWS_WITHOUT_SERVER ON CACHE BOOL "" FORCE)
-set(LWS_WITHOUT_TESTAPPS ON CACHE BOOL "" FORCE)
-set(LWS_WITHOUT_TEST_SERVER ON CACHE BOOL "" FORCE)
-set(LWS_WITHOUT_TEST_SERVER_EXTPOLL ON CACHE BOOL "" FORCE)
-set(LWS_WITHOUT_TEST_PING ON CACHE BOOL "" FORCE)
-set(LWS_WITHOUT_TEST_CLIENT ON CACHE BOOL "" FORCE)
-set(LWS_UNIX_SOCK OFF CACHE BOOL "" FORCE)
-set(LWS_WITH_HTTP_DIGEST_AUTH OFF CACHE BOOL "" FORCE)
-set(LWS_CTEST_INTERNET_AVAILABLE OFF CACHE BOOL "" FORCE)
-
-add_subdirectory(libwebsockets)
-
-# ---------------------
 # json
 # ---------------------
 add_subdirectory(json)
