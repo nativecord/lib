@@ -16,6 +16,19 @@ set(CMAKE_CXX_STANDARD 20)
 project(nativecord-lib LANGUAGES CXX)
 add_subdirectory(vendor) # vencord reference????
 
+# ---------------------
+# warnings
+# ---------------------
+add_library(nativecord-warnings INTERFACE)
+if (MSVC)
+    target_compile_options(nativecord-warnings INTERFACE /W4 /WX)
+else()
+    target_compile_options(nativecord-warnings INTERFACE -Wall -Wextra -Werror)
+endif()
+
+# ---------------------
+# library
+# ---------------------
 file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS "src/lib/*.cpp" "src/lib/*.h")
 
 if (NATIVECORD_LIB_SHARED)
@@ -24,14 +37,10 @@ if (NATIVECORD_LIB_SHARED)
 else()
     add_library(nativecord-lib STATIC ${LIB_SOURCES})
 endif()
-target_include_directories(nativecord-lib PUBLIC "src/lib")
-target_link_libraries(nativecord-lib PRIVATE nlohmann_json websockets ${LIBWEBSOCKETS_DEP_LIBS})
-set_target_properties(nativecord-lib PROPERTIES USE_FOLDERS ON)
 
-if (MSVC)
-    target_compile_options(nativecord-lib PRIVATE /W4 /WX)
-else()
-    target_compile_options(nativecord-lib PRIVATE -Wall -Wextra -Werror)
+target_include_directories(nativecord-lib PUBLIC "src/lib")
+target_link_libraries(nativecord-lib PRIVATE nativecord-warnings websockets ${LIBWEBSOCKETS_DEP_LIBS} nlohmann_json)
+set_target_properties(nativecord-lib PROPERTIES USE_FOLDERS ON)
 endif()
 
 # ---------------------
@@ -40,14 +49,8 @@ endif()
 if (NATIVECORD_LIB_TEST) 
     file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS "src/test/*.cpp" "src/test/*.h")
     add_executable(nativecord-test ${TEST_SOURCES})
-    target_link_libraries(nativecord-test PUBLIC nativecord-lib nlohmann_json)
+    target_link_libraries(nativecord-test PRIVATE nativecord-lib nativecord-warnings nlohmann_json)
     set_target_properties(nativecord-test PROPERTIES USE_FOLDERS ON)
-
-    if (MSVC)
-        target_compile_options(nativecord-test PRIVATE /W4 /WX)
-    else()
-        target_compile_options(nativecord-test PRIVATE -Wall -Wextra -Werror)
-    endif()
 
     if (MSVC)
         set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT nativecord-test)
