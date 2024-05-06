@@ -13,8 +13,8 @@ set(CMAKE_CXX_STANDARD 20)
 # ---------------------
 # project
 # ---------------------
-project(nativecord-lib LANGUAGES CXX)
-add_subdirectory(vendor) # vencord reference????
+    project(nativecord-lib LANGUAGES CXX)
+add_subdirectory(vendor)
 
 # ---------------------
 # warnings
@@ -34,6 +34,9 @@ file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS "src/lib/*.cpp" "src/lib/*.h")
 if (NATIVECORD_LIB_SHARED)
     add_library(nativecord-lib SHARED ${LIB_SOURCES})
     target_compile_definitions(nativecord-lib PUBLIC ADDS NATIVECORD_LIB_SHARED)
+    if (MSVC)
+        target_compile_options(nativecord-lib PRIVATE /DLL)
+    endif()
 else()
     add_library(nativecord-lib STATIC ${LIB_SOURCES})
 endif()
@@ -54,11 +57,12 @@ if (NATIVECORD_LIB_TEST)
 
     if (MSVC)
         set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT nativecord-test)
-        target_compile_definitions(nativecord-test PUBLIC ADDS WIN32_LEAN_AND_MEAN)
+        target_compile_definitions(nativecord-test PRIVATE ADDS WIN32_LEAN_AND_MEAN)
+
         if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86")
-            target_compile_definitions(nativecord-test PUBLIC ADDS _X86_)
+            target_compile_definitions(nativecord-test PRIVATE ADDS _X86_)
         elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "AMD64" OR CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
-            target_compile_definitions(nativecord-test PUBLIC ADDS _AMD64_)
+            target_compile_definitions(nativecord-test PRIVATE ADDS _AMD64_)
         else()
             message(FATAL_ERROR "Unimplemented architecture (${CMAKE_SYSTEM_PROCESSOR})")
         endif()
