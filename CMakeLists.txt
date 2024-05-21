@@ -60,6 +60,7 @@ if(NATIVECORD_LIB_TEST)
   target_link_libraries(
     nativecord-test PRIVATE nativecord-lib nativecord-warnings nlohmann_json)
   set_target_properties(nativecord-test PROPERTIES USE_FOLDERS ON)
+  target_include_directories(nativecord-test PUBLIC "src/test")
 
   if(MSVC)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
