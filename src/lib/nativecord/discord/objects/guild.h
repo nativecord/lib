@@ -1,91 +1,125 @@
 #pragma once
 
-#include "objects.h"
+#include "nativecord/internal/objectbase.h"
+#include "nativecord/internal/serializers/guild.h"
 
-#include "nativecord/classes/cache.h"
+#include "nativecord/discord/defs.h"
 
-#define GUILD_CHANNEL_CACHE_SIZE 250
+#include "nativecord/util/cache.h"
 
-struct WelcomeScreenChannel
+#include "user.h"
+
+namespace nativecord
 {
-        uint64_t channel_id;
-        std::string description;
-        std::optional<uint64_t> emoji_id;
-        std::optional<std::string> emoji_name;
-};
-NC_JSON_DECLFUNCS(WelcomeScreenChannel, channel_id, description, emoji_id, emoji_name);
+    struct WelcomeScreenChannel
+    {
+            snowflake channel_id;
+            std::string description;
+            std::optional<uint64_t> emoji_id;
+            std::optional<std::string> emoji_name;
+    };
 
-struct WelcomeScreen
-{
-        std::optional<std::string> description;
-        std::vector<WelcomeScreenChannel> welcome_channels;
-};
-NC_JSON_DECLFUNCS(WelcomeScreen, description, welcome_channels);
+    struct WelcomeScreen
+    {
+            std::optional<std::string> description;
+            std::vector<WelcomeScreenChannel> welcome_channels;
+    };
 
-class Guild : public ObjectBase
-{
-    public:
-        Guild();
-        Guild(nativecord::Client* client);
-        ~Guild();
+    struct AvatarDecorationData
+    {
+            std::string asset;
+            std::string sku_id;
+    };
 
-        inline Cache<snowflake, class Channel>* getChannelCache() const { return _channelCache; }
+    struct GuildMember
+    {
+            std::optional<User> user;
+            std::optional<std::string> nick;
+            std::optional<std::string> avatar;
+            std::vector<uint64_t> roles;
+            std::string joined_at;
+            std::optional<std::string> premium_since;
+            bool deaf;
+            bool mute;
+            uint64_t flags;
+            std::optional<bool> pending;
+            std::optional<std::string> permissions;
+            std::optional<std::string> communication_disabled_until;
+            std::optional<AvatarDecorationData> avatar_decoration_data;
+    };
 
-        snowflake id;
-        std::string name;
-        std::optional<std::string> icon;
-        std::optional<std::string> icon_hash;
-        std::optional<std::string> splash;
-        std::optional<std::string> discovery_splash;
+    class Guild : ObjectBase
+    {
+        public:
+            NC_EXPORT Guild();
+            NC_EXPORT Guild(nativecord::Client* client);
+            NC_EXPORT Guild(nativecord::Client* client, snowflake id);
+            NC_EXPORT ~Guild();
 
-        std::optional<bool> owner;
-        snowflake owner_id;
+            NC_EXPORT std::shared_ptr<class Channel> getChannel(snowflake id);
+            NC_EXPORT std::shared_ptr<struct GuildMember> getMember(snowflake id);
 
-        std::optional<std::string> permissions;
+            NC_EXPORT auto getChannelCache() { return _channelCache; }
 
-        int verification_level;
-        int default_message_notifications;
-        int explicit_content_filter;
-        int nsfw_level;
-        int mfa_level;
+            snowflake id;
+            std::string name;
+            std::optional<std::string> icon;
+            std::optional<std::string> icon_hash;
+            std::optional<std::string> splash;
+            std::optional<std::string> discovery_splash;
 
-        // std::vector<Role> roles;
-        // std::vector<Emoji> emojis;
-        // std::vector<GuildFeature> features;
-        // std::vector<Sticker> stickers;
+            std::optional<bool> owner;
+            snowflake owner_id;
 
-        std::optional<snowflake> widget_channel_id;
-        std::optional<bool> widget_enabled;
-        std::optional<snowflake> application_id;
-        std::optional<snowflake> public_updates_channel_id;
-        std::optional<snowflake> rules_channel_id;
-        std::optional<snowflake> safety_alerts_channel_id;
-        std::optional<snowflake> system_channel_id;
-        int system_channel_flags;
-        std::optional<snowflake> afk_channel_id;
-        std::optional<int> afk_timeout;
+            std::optional<std::string> permissions;
 
-        std::optional<std::string> vanity_url_code;
-        std::optional<std::string> description;
-        std::optional<std::string> banner;
+            int verification_level;
+            int default_message_notifications;
+            int explicit_content_filter;
+            int nsfw_level;
+            int mfa_level;
 
-        int premium_tier;
-        std::optional<int> premium_subscription_count;
-        bool premium_bar_enabled;
+            // std::vector<Role> roles;
+            // std::vector<Emoji> emojis;
+            // std::vector<GuildFeature> features;
+            // std::vector<Sticker> stickers;
 
-        std::string preferred_locale;
+            std::optional<snowflake> widget_channel_id;
+            std::optional<bool> widget_enabled;
+            std::optional<snowflake> application_id;
+            std::optional<snowflake> public_updates_channel_id;
+            std::optional<snowflake> rules_channel_id;
+            std::optional<snowflake> safety_alerts_channel_id;
+            std::optional<snowflake> system_channel_id;
+            int system_channel_flags;
+            std::optional<snowflake> afk_channel_id;
+            std::optional<int> afk_timeout;
 
-        std::optional<int> max_members;
-        std::optional<int> max_presences;
-        std::optional<int> max_video_channel_users;
-        std::optional<int> max_stage_video_channel_users;
-        std::optional<int> approximate_member_count;
-        std::optional<int> approximate_presence_count;
+            std::optional<std::string> vanity_url_code;
+            std::optional<std::string> description;
+            std::optional<std::string> banner;
 
-        std::optional<WelcomeScreen> welcome_screen;
+            int premium_tier;
+            std::optional<int> premium_subscription_count;
+            bool premium_bar_enabled;
 
-    private:
-        Cache<snowflake, class Channel>* _channelCache;
-};
-NC_EXPORT void to_json(nlohmann::json& nlohmann_json_j, const Guild& nlohmann_json_t);
-NC_EXPORT void from_json(const nlohmann::json& nlohmann_json_j, Guild& nlohmann_json_t);
+            std::string preferred_locale;
+
+            std::optional<int> max_members;
+            std::optional<int> max_presences;
+            std::optional<int> max_video_channel_users;
+            std::optional<int> max_stage_video_channel_users;
+            std::optional<int> approximate_member_count;
+            std::optional<int> approximate_presence_count;
+
+            std::optional<WelcomeScreen> welcome_screen;
+
+            friend void from_json(const nlohmann::json& nlohmann_json_j, Guild& nlohmann_json_t);
+        private:
+            void initCache();
+            bool hasCache = false;
+
+            Cache<snowflake, Channel>* _channelCache;
+            Cache<snowflake, GuildMember>* _memberCache;
+    };
+}

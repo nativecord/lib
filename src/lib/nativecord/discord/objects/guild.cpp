@@ -1,52 +1,43 @@
 #include "guild.h"
 #include "channel.h"
 
-Guild::Guild()
-{
-}
+#include "nativecord/config.h"
 
-Guild::Guild(nativecord::Client* client) : ObjectBase(client)
+using namespace nativecord;
+
+Guild::Guild() {}
+
+Guild::Guild(Client* client) : ObjectBase(client) { initCache(); }
+
+Guild::Guild(Client* client, snowflake guildId) : ObjectBase(client)
 {
-    _channelCache = new Cache<snowflake, class Channel>(GUILD_CHANNEL_CACHE_SIZE);
+    initCache();
+    id = guildId;
 }
 
 Guild::~Guild()
 {
-    if (_channelCache)
-        delete _channelCache;
+    if (!hasCache)
+        return;
+    delete _channelCache;
+    delete _memberCache;
 }
 
-void to_json(nlohmann::json& nlohmann_json_j, const Guild& nlohmann_json_t)
+std::shared_ptr<Channel> Guild::getChannel(snowflake channelId)
 {
-    NLOHMANN_JSON_PASTE(NC_TO_JSON, id, name, icon, icon_hash, splash, discovery_splash, owner, owner_id, permissions,
-                        verification_level, default_message_notifications, explicit_content_filter, nsfw_level,
-                        mfa_level, widget_channel_id, widget_enabled, application_id, public_updates_channel_id,
-                        rules_channel_id, safety_alerts_channel_id, system_channel_id, system_channel_flags,
-                        afk_channel_id, afk_timeout, vanity_url_code, description, banner, premium_tier,
-                        premium_subscription_count, premium_bar_enabled, preferred_locale, max_members, max_presences,
-                        max_video_channel_users, max_stage_video_channel_users, approximate_member_count,
-                        approximate_presence_count, welcome_screen);
+    auto channel = _channelCache->get(channelId);
+    return nullptr;
 }
 
-void from_json(const nlohmann::json& nlohmann_json_j, Guild& nlohmann_json_t)
+std::shared_ptr<GuildMember> Guild::getMember(snowflake memberId)
 {
-    if (nlohmann_json_j.contains("channels"))
-    {
-        for (auto channelJs : nlohmann_json_j["channels"])
-        {
-            auto channel = std::make_unique<Channel>(nlohmann_json_t.getClient());
-            channelJs.get_to(*channel);
-            std::string id = channel->id;
-            nlohmann_json_t.getChannelCache()->insert(id, std::move(channel));
-        }
-    }
-    
-    NLOHMANN_JSON_PASTE(NC_FROM_JSON, id, name, icon, icon_hash, splash, discovery_splash, owner, owner_id, permissions,
-                        verification_level, default_message_notifications, explicit_content_filter, nsfw_level,
-                        mfa_level, widget_channel_id, widget_enabled, application_id, public_updates_channel_id,
-                        rules_channel_id, safety_alerts_channel_id, system_channel_id, system_channel_flags,
-                        afk_channel_id, afk_timeout, vanity_url_code, description, banner, premium_tier,
-                        premium_subscription_count, premium_bar_enabled, preferred_locale, max_members, max_presences,
-                        max_video_channel_users, max_stage_video_channel_users, approximate_member_count,
-                        approximate_presence_count, welcome_screen);
+    auto member = _memberCache->get(memberId);
+    return nullptr;
+}
+
+void nativecord::Guild::initCache()
+{
+    _channelCache = new Cache<snowflake, Channel>(NC_DEFAULT_CHANNEL_CACHE_SIZE);
+    _memberCache = new Cache<snowflake, GuildMember>(NC_DEFAULT_GUILDMEMBER_CACHE_SIZE);
+    hasCache = true;
 }

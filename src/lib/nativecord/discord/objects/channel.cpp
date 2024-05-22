@@ -1,29 +1,27 @@
 #include "channel.h"
 #include "message.h"
 
-#include "nativecord/client.h"
+#include "nativecord/internal/clientbase.h"
 
-#include <format>
+using namespace nativecord;
 
-Channel::Channel(nativecord::Client* client, snowflake channelId)
+nativecord::Channel::Channel(Client* client) : ObjectBase(client) {}
+
+Channel::Channel(Client* client, snowflake channelId) : ObjectBase(client)
 {
-    _client = client;
-    auto res = _client->apiCall(std::format("channels/{}", channelId).c_str(), HTTP_GET);
-    if (!res.second.empty())
-    {
-        nlohmann::json channelJs = nlohmann::json::parse(res.second);
-        channelJs.get_to(*this);
-    }
+    auto res = _getClientBase()->apiCall(std::format("channels/{}", channelId).c_str(), HTTP_GET);
+    nlohmann::json channelJs = nlohmann::json::parse(res.second);
+    channelJs.get_to(*this);
 }
 
 void Channel::sendMessage(std::string content)
 {
     nlohmann::json payload({{"content", content}});
-    _client->apiCall(std::format("channels/{}/messages", id).c_str(), HTTP_POST, &payload);
+    _getClientBase()->apiCall(std::format("channels/{}/messages", id).c_str(), HTTP_POST, &payload);
 }
 
-void Channel::sendMessage(Message* msg)
+void Channel::sendMessage(Message& msg)
 {
-    nlohmann::json msgPayload(*msg);
-    _client->apiCall(std::format("channels/{}/messages", id).c_str(), HTTP_POST, &msgPayload);
+    nlohmann::json msgPayload(msg);
+    _getClientBase()->apiCall(std::format("channels/{}/messages", id).c_str(), HTTP_POST, &msgPayload);
 }
