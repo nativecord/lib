@@ -1,7 +1,7 @@
 #pragma once
 
-typedef int clientIntents;
-enum _clientIntents
+typedef int ClientIntents;
+enum _ClientIntents
 {
     INTENT_GUILDS = 1 << 0,
     INTENT_GUILD_MEMBERS = 1 << 1,

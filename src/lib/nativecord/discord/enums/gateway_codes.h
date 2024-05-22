@@ -4,7 +4,7 @@
     https://github.com/discord/discord-api-docs/blob/main/docs/topics/Opcodes_and_Status_Codes.md
 */
 
-enum gatewayCode
+enum GatewayCode
 {
     GATEWAY_INVALID = -1,
     GATEWAY_DISPATCH = 0,
@@ -20,7 +20,7 @@ enum gatewayCode
     GATEWAY_HEARTBEAT_ACK = 11
 };
 
-enum gatewayCloseCode
+enum GatewayCloseCode
 {
     CLOSE_UNKNOWN_ERROR = 4000,
     CLOSE_UNKNOWN_OPCODE = 4001,
@@ -38,7 +38,7 @@ enum gatewayCloseCode
     CLOSE_DISALLOWED_INTENTS = 4014
 };
 
-enum gatewayVoiceCode
+enum GatewayVoiceCode
 {
     VOICE_IDENTIFY = 0,
     VOICE_SELECT_PROTOCOL = 1,
@@ -53,7 +53,7 @@ enum gatewayVoiceCode
     VOICE_CLIENT_DISCONNECT = 13
 };
 
-enum voiceCloseCode {
+enum VoiceCloseCode {
     VOICE_CLOSE_UNKNOWN_OPCODE = 4001,
     VOICE_CLOSE_FAILED_TO_DECODE_PAYLOAD = 4002,
     VOICE_CLOSE_NOT_AUTHENTICATED = 4003,
