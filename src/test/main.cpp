@@ -6,86 +6,102 @@
 #include <nlohmann/json.hpp>
 
 #include <chrono>
+#include <csignal>
 #include <filesystem>
 #include <fstream>
-#include <stdexcept>
+#include <thread>
 
 #include "util/log.h"
 
+#include "commandmanager.h"
+#include "commands/general.h"
+
+using namespace nativecord;
+
+/*
+    error handling helpers
+*/
+template <typename... Args> inline void displayError(const std::format_string<Args...> fmt, Args&&... args)
+{
+    std::string msg(std::vformat(fmt.get(), std::make_format_args(args...)));
+    Log::error("{}", msg);
+    Log::error("Press any key to exit...");
+    std::cin;
+    exit(-1);
+}
+
 #define ASSERT(cond, msg)                                                                                              \
     if (!(cond))                                                                                                       \
-    {                                                                                                                  \
-        Log::error(msg);                                                                                               \
-        return -1;                                                                                                     \
-    }
+        displayError(msg);
 
-int main(int /*argc*/, char* argv[])
+// ctrl+c handling stuff
+bool running = true;
+void sigintHandler(int signum) { running = false; }
+
+int main(int, char* argv[])
 {
+    // register sigint listener
+    std::signal(SIGINT, sigintHandler);
+
 #ifdef _WIN32
-    Log::setupConsole();
+    Log::setupConsole(); // enable ANSI on Windows
 #endif
 
-    Log::info("Loading config");
-    std::filesystem::path binPath = std::filesystem::absolute(std::filesystem::path(argv[0])).parent_path();
-    std::filesystem::path configPath(binPath.string());
-    configPath /= "config.json";
-    ASSERT(std::filesystem::exists(configPath), "config.json does not exist");
+    /*
+        config parsing
+    */
+    std::filesystem::path path = std::filesystem::absolute(std::filesystem::path(argv[0])).parent_path();
+    path /= "config.json";
 
-    std::ifstream configStream(configPath);
+    ASSERT(std::filesystem::exists(path), "missing config.json");
+
+    std::ifstream configStream(path);
     ASSERT(configStream.is_open(), "failed to open config.json");
 
-    nlohmann::json config = nlohmann::json::parse(configStream);
+    nlohmann::json config;
+    try
+    {
+        config = nlohmann::json::parse(configStream);
+        ASSERT(config.contains("token"), "missing token on config.json");
+    }
+    catch (std::exception ex)
+    {
+        displayError("failed to parse config.json ({})", ex.what());
+    }
 
-    std::string token;
-    ASSERT(config.contains("token"), "invalid config (missing token)");
-    config["token"].get_to(token);
+    /*
+        set command manager prefix
+    */
+    std::string prefix(".t ");
+    if (config.contains("prefix"))
+        config["prefix"].get_to(prefix);
+    CommandManager::get()->setPrefix(prefix);
 
-    nativecord::Client* client = new nativecord::Client();
-    client->setToken(token);
+    /*
+        instantiate client
+    */
+    Client* client = new Client();
+    client->setToken(config["token"]);
     client->setIntents(INTENT_GUILDS | INTENT_GUILD_MESSAGES | INTENT_GUILD_MEMBERS);
 
-    client->on("ready", [](nativecord::Client* client) {
-        Log::info("client is ready");
-        Log::info("Logged in as {} ({})", client->getUser()->username, client->getUser()->id);
+    /*
+        event listeners
+    */
+    client->on("dispatch", [](Client* client, std::string name, nlohmann::json&) {
+        Log::verbose("received dispatch of type: {}", name);
     });
+    client->on("disconnect", [](Client*) { Log::info("client disconnected"); });
+    client->on("message",
+               [](Client* client, nativecord::Message* msg) { CommandManager::get()->handleMessage(client, msg); });
 
-    client->on("dispatch", [](nativecord::Client* client, nlohmann::json& js) {
-        std::string type = js["t"].get<std::string>();
-        Log::info("received dispatch of type: {}", type);
-        if (type == "MESSAGE_CREATE")
-        {
-            Message msg = js["d"];
-            if (msg.author.value().id == client->getUser()->id)
-                return;
-
-            if (msg.content == "hi")
-            {
-                snowflake channelId = js["d"]["channel_id"].get<snowflake>();
-                auto TestChannel = new Channel(client, channelId);
-
-                Message reply{};
-                reply.content = "hello";
-                reply.message_reference =
-                    std::make_optional<MessageReference>({msg.id, std::nullopt, std::nullopt, std::nullopt});
-
-                TestChannel->sendMessage(&reply);
-            }
-        }
-    });
-
-    client->on("disconnect",
-               [](nativecord::Client*, int reason) { Log::info("Client disconnected with reason: {}", reason); });
-
+    /*
+        connect and await exit
+    */
     client->connect();
 
-    std::string in;
-    while (std::getline(std::cin, in))
-    {
-        if (in == "stop")
-        {
-            break;
-        }
-    }
+    Log::info("Press CTRL + C to exit");
+    while (running)
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
     return 0;
 }
