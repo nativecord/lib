@@ -6,8 +6,8 @@
 static hv::HttpClient* client = new hv::HttpClient();
 
 std::pair<int, std::string> nativecord::http::req(std::string url, http_method method, std::optional<std::string> body,
-                                                   std::unordered_map<std::string, std::string>* headers,
-                                                   std::string userAgent)
+                                                  std::unordered_map<std::string, std::string>* headers,
+                                                  std::string userAgent)
 {
     HttpRequest req;
     req.method = method;

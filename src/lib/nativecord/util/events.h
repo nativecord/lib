@@ -8,6 +8,8 @@
 /*
     to-do:
         add way to unregister listeners
+        implement using std::function
+        accept inherited classes (i.e. ClientBase which is contained by Client)
 */
 
 template <typename T> struct function_traits : public function_traits<decltype(&T::operator())>
