@@ -1,32 +1,28 @@
 #pragma once
 
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <vector>
-
-#include <nlohmann/json.hpp>
-
 #include "nativecord/util/macros.h"
 
-typedef std::string snowflake;
+#include <optional>
+
+#include <nlohmann/json.hpp>
 
 namespace nativecord
 {
     class Client;
+
+    class ObjectBase
+    {
+        public:
+            NC_EXPORT ObjectBase() : _client(nullptr){};
+            NC_EXPORT ObjectBase(Client* client) : _client(client){};
+
+            inline Client* _getClient() { return _client; }
+            inline class ClientBase* _getClientBase() { return reinterpret_cast<ClientBase*>(_client); }
+
+        protected:
+            Client* _client;
+    };
 }
-
-class ObjectBase
-{
-    public:
-        NC_EXPORT ObjectBase() : _client(nullptr){};
-        NC_EXPORT ObjectBase(nativecord::Client* client) : _client(client){};
-
-        inline nativecord::Client* getClient() { return _client; }
-
-    protected:
-        nativecord::Client* _client;
-};
 
 /*
     serialization with std::optional
@@ -76,13 +72,15 @@ template <typename T, class J> inline void fromJson(const char* key, const J& j,
 #define NC_TO_JSON(val) toJson(#val, nlohmann_json_j, nlohmann_json_t.val);
 #define NC_FROM_JSON(val) fromJson(#val, nlohmann_json_j, nlohmann_json_t.val);
 
-#define NC_JSON_DECLFUNCS(Type, ...)                                                                                   \
-    inline void to_json(nlohmann::json& nlohmann_json_j, const Type& nlohmann_json_t)                                  \
-    {                                                                                                                  \
-        NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NC_TO_JSON, __VA_ARGS__))                                             \
-    }                                                                                                                  \
+#define NC_JSON_FUNCS(Type, ...)                                                                                       \
+    void to_json(nlohmann::json& nlohmann_json_j, const Type& nlohmann_json_t){                              \
+        NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NC_TO_JSON, __VA_ARGS__))}                                            \
                                                                                                                        \
-    inline void from_json(const nlohmann::json& nlohmann_json_j, Type& nlohmann_json_t)                                \
+    void from_json(const nlohmann::json& nlohmann_json_j, Type& nlohmann_json_t)                             \
     {                                                                                                                  \
         NLOHMANN_JSON_EXPAND(NLOHMANN_JSON_PASTE(NC_FROM_JSON, __VA_ARGS__));                                          \
     }
+
+#define NC_JSON_DECLFUNCS(Type)                                                                                        \
+    NC_EXPORT void to_json(nlohmann::json& nlohmann_json_j, const Type& nlohmann_json_t);                              \
+    NC_EXPORT void from_json(const nlohmann::json& nlohmann_json_j, Type& nlohmann_json_t);
