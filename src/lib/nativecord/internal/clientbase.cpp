@@ -13,7 +13,9 @@
 
 #include <regex>
 
-nativecord::ClientBase::ClientBase(std::string token) : _ws(DISCORD_WS_URL, true, this)
+using namespace nativecord;
+
+ClientBase::ClientBase(std::string token) : _ws(DISCORD_WS_URL, true, this)
 {
     _guildCache = new Cache<snowflake, Guild>(NC_DEFAULT_GUILD_CACHE_SIZE);
     _channelCache = new Cache<snowflake, Channel>(NC_DEFAULT_CHANNEL_CACHE_SIZE);
@@ -32,14 +34,14 @@ nativecord::ClientBase::ClientBase(std::string token) : _ws(DISCORD_WS_URL, true
     registerEvents();
 }
 
-nativecord::ClientBase::~ClientBase()
+ClientBase::~ClientBase()
 {
     delete _guildCache;
     delete _channelCache;
     delete _userCache;
 }
 
-void nativecord::ClientBase::registerEvents()
+void ClientBase::registerEvents()
 {
     _ev.registerEvent<Client*, Message*>("message");
     _dispatchListeners["MESSAGE_CREATE"] = [](ClientBase* client, nlohmann::json& js) {
@@ -67,7 +69,7 @@ void nativecord::ClientBase::registerEvents()
     _ev.registerEvent<Client*, std::string>("error");
 }
 
-void nativecord::ClientBase::gatewayConnect()
+void ClientBase::gatewayConnect()
 {
     // token / intent validation
     if (_token.empty())
@@ -87,7 +89,7 @@ void nativecord::ClientBase::gatewayConnect()
     _ws.connect();
 }
 
-void nativecord::ClientBase::gatewayHeartbeat()
+void ClientBase::gatewayHeartbeat()
 {
     nlohmann::json heartbeat({{"op", GATEWAY_HEARTBEAT}});
     if (_lastSequence)
@@ -95,7 +97,7 @@ void nativecord::ClientBase::gatewayHeartbeat()
     gatewaySend(heartbeat);
 }
 
-void nativecord::ClientBase::gatewayHello(nlohmann::json& js)
+void ClientBase::gatewayHello(nlohmann::json& js)
 {
     int heartbeatInterval = js["d"]["heartbeat_interval"].get<int>();
     _ws.channel->setHeartbeat(heartbeatInterval, [this]() { this->gatewayHeartbeat(); });
@@ -113,13 +115,13 @@ void nativecord::ClientBase::gatewayHello(nlohmann::json& js)
     gatewaySend(id);
 }
 
-void nativecord::ClientBase::gatewaySend(nlohmann::json& js)
+void ClientBase::gatewaySend(nlohmann::json& js)
 {
     std::string jsStr = js.dump();
     _ws.send(jsStr);
 }
 
-std::pair<int, std::string> nativecord::ClientBase::apiCall(const char* path, http_method method,
+std::pair<int, std::string> ClientBase::apiCall(const char* path, http_method method,
                                                             nlohmann::json* payload)
 {
     std::string url = std::string(DISCORD_API_URL) + path;
@@ -137,7 +139,7 @@ std::pair<int, std::string> nativecord::ClientBase::apiCall(const char* path, ht
     return http::req(url, method, body, &headers);
 }
 
-void nativecord::ClientBase::gatewayReceive(const std::string& data)
+void ClientBase::gatewayReceive(const std::string& data)
 {
     nlohmann::json js = nlohmann::json::parse(data);
 
