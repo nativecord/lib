@@ -6,6 +6,8 @@
 #include "nativecord/discord/defs.h"
 #include "nativecord/discord/objects/guild.h"
 
+#include <memory>
+
 namespace nativecord
 {
     enum ChannelType : int32_t
@@ -69,7 +71,6 @@ namespace nativecord
     {
         public:
             NC_EXPORT Channel(){};
-            NC_EXPORT Channel(Client* client);
             NC_EXPORT Channel(Client* client, snowflake channelId);
 
             NC_EXPORT void sendMessage(std::string content);
@@ -110,5 +111,10 @@ namespace nativecord
             std::optional<int> default_sort_order;
             std::optional<int> default_thread_rate_limit_per_user;
             std::optional<int> default_forum_layout;
+
+        protected:
+            Channel(Client*);
+            static std::shared_ptr<Channel> _createShared(Client*);
+            friend inline void from_json(const nlohmann::json& nlohmann_json_j, Guild& nlohmann_json_t);
     };
 }

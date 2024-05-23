@@ -30,7 +30,7 @@ namespace nativecord
         {
              for (auto channelJs : nlohmann_json_j["channels"])
              {
-                 auto channel = std::make_shared<Channel>(nlohmann_json_t._getClient());
+                 auto channel = Channel::_createShared(nlohmann_json_t._getClient());
                  channelJs.get_to(*channel);
                  std::string id = channel->id;
                  nlohmann_json_t.getChannelCache()->insert(id, std::move(channel));

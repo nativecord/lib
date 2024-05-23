@@ -7,6 +7,11 @@ using namespace nativecord;
 
 nativecord::Channel::Channel(Client* client) : ObjectBase(client) {}
 
+std::shared_ptr<Channel> nativecord::Channel::_createShared(Client* client)
+{
+    return std::shared_ptr<Channel>(new Channel(client));
+}
+
 Channel::Channel(Client* client, snowflake channelId) : ObjectBase(client)
 {
     auto res = _getClientBase()->apiCall(std::format("channels/{}", channelId).c_str(), HTTP_GET);
