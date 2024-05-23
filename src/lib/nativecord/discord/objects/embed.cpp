@@ -1,6 +1,8 @@
 #include "embed.h"
 
-void nativecord::Embed::addField(std::string name, std::string value, std::optional<bool> isInline)
+using namespace nativecord;
+
+void Embed::addField(std::string name, std::string value, std::optional<bool> isInline)
 {
     EmbedField field;
     field.name = name;
@@ -13,7 +15,16 @@ void nativecord::Embed::addField(std::string name, std::string value, std::optio
     fields.value().push_back(field);
 }
 
-void nativecord::Embed::setColor(uint8_t r, uint8_t g, uint8_t b)
+void Embed::setColor(uint8_t r, uint8_t g, uint8_t b)
 {
     color = (static_cast<uint32_t>(r) << 16) | (static_cast<uint32_t>(g) << 8) | static_cast<uint32_t>(b);
+}
+
+void Embed::getColor(uint8_t& r, uint8_t& g, uint8_t& b)
+{
+    if (!color)
+        return;
+    r = static_cast<uint8_t>((color.value() >> 16) & 0xFF);
+    g = static_cast<uint8_t>((color.value() >> 8) & 0xFF);
+    b = static_cast<uint8_t>(color.value() & 0xFF);
 }

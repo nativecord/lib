@@ -50,6 +50,7 @@ namespace nativecord
         public:
             NC_EXPORT void addField(std::string name, std::string value, std::optional<bool> isInline = std::nullopt);
             NC_EXPORT void setColor(uint8_t r, uint8_t g, uint8_t b);
+            NC_EXPORT void getColor(uint8_t& r, uint8_t& g, uint8_t& b);
 
             std::optional<std::string> title;
             std::optional<std::string> type;
