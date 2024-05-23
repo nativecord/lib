@@ -5,9 +5,9 @@
 
 using namespace nativecord;
 
-nativecord::Channel::Channel(Client* client) : ObjectBase(client) {}
+Channel::Channel(Client* client) : ObjectBase(client) {}
 
-std::shared_ptr<Channel> nativecord::Channel::_createShared(Client* client)
+std::shared_ptr<Channel> Channel::_createShared(Client* client)
 {
     return std::shared_ptr<Channel>(new Channel(client));
 }

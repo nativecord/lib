@@ -70,7 +70,8 @@ namespace nativecord
     class Channel : ObjectBase
     {
         public:
-            NC_EXPORT Channel(){};
+            Channel(){}; // do not use!!! this is only here for JSON deserialization purposes
+
             NC_EXPORT Channel(Client* client, snowflake channelId);
 
             NC_EXPORT void sendMessage(std::string content);
@@ -112,9 +113,11 @@ namespace nativecord
             std::optional<int> default_thread_rate_limit_per_user;
             std::optional<int> default_forum_layout;
 
+
         protected:
+            friend NC_EXPORT void from_json(const nlohmann::json&, Guild&);
+            static std::shared_ptr<Channel> _createShared(Client* client);
+
             Channel(Client*);
-            static std::shared_ptr<Channel> _createShared(Client*);
-            friend inline void from_json(const nlohmann::json& nlohmann_json_j, Guild& nlohmann_json_t);
     };
 }
