@@ -56,7 +56,7 @@ void ClientBase::registerEvents()
     };
 
     _dispatchListeners["GUILD_CREATE"] = [](ClientBase* client, nlohmann::json& js) {
-        auto guild = std::make_shared<Guild>(reinterpret_cast<Client*>(client));
+        auto guild = Guild::_createShared(reinterpret_cast<Client*>(client));
         js.at("d").get_to(*guild);
         snowflake id = guild->id;
         if (client->_guildCache->contains(id))
