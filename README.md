@@ -31,32 +31,50 @@
 ## Example usage
 ```C++
 #include <nativecord/client.h>
+#include <nativecord/discord/objects/channel.h>
+#include <nativecord/discord/objects/message.h>
+#include <nativecord/discord/objects/user.h>
 
-void yourFunction() {
-	/*
-		instantiate client, configure and register connection
-	*/
-	nativecord::Client client;
-	client.setToken(yourToken);
-	client.setIntents(INTENT_GUILDS | INTENT_GUILD_MESSAGES | INTENT_GUILD_MEMBERS);
-	client.connect();
-	
-	client.on("ready", [](nativecord::Client* client) {
-		Log::Info("Client is ready");
- 		Log::Info("Logged in as {} | {}", client->getUser()->username, client->getUser()->id);
-		client->setPersona(STATUS_IDLE);
-	});
+#include <iostream>
 
-	/*
-		this will yield the current thread untill all clients are disconnected
-	*/
-	nativecord::websockets::pollEvents();
+using namespace nativecord;
+int main()
+{
+    /*
+        instantiate client, setup and connect
+    */
+    Client client;
+    client.setToken("Bot YOUR_TOKEN");
+    client.setIntents(INTENT_GUILDS | INTENT_GUILD_MESSAGES | INTENT_GUILD_MEMBERS);
+    client.connect();
+
+    /*
+        register event listeners
+    */
+    client.on("ready", [](Client* client) {
+        auto user = client->getUser();
+        std::cout << "Logged in as" << user->username << " - " << user->id << std::endl;
+    });
+
+    client.on("message", [](Client* client, Message* msg) {
+        if (msg->content == "ping")
+        {
+            std::cout << "Received ping from" << msg->author->username << std::endl;
+            auto channel = client->getChannel(*msg->channel_id);
+            channel->sendMessage("pong");
+        }
+    });
+
+    while (true)
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
+
+    return 0;
 }
 ```
 
 ## Contributing
 We welcome contributions to nativecord. If you'd like to contribute, please follow these guidelines:
-1. ***Conventional commits*** - Follow the [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/).  specification for commit messages. This helps automate versioning and generate meaningful changelogs.
+1. ***Conventional commits*** - Follow the [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) specification for commit messages. This helps automate versioning and generate meaningful changelogs.
 2. ***Branch Naming Convention*** - Use descriptive branch names that reflect the purpose of your changes. Preferably, use kebab-case or snake_case for branch names.
 3. ***Code Style and Formatting*** - Follow the project's existing code style and formatting guidelines. Ensure .clang-format has formatted your code before commiting.
 4. ***Committing Changes*** - Avoid committing unrelated changes in the same commit, Keep each commit focused on a single logical change and Squash related commits before opening a pull request to keep the commit history clean and concise.
