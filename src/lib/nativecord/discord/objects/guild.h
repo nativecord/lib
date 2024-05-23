@@ -9,6 +9,8 @@
 
 #include "user.h"
 
+#include <memory>
+
 namespace nativecord
 {
     struct WelcomeScreenChannel
@@ -51,10 +53,8 @@ namespace nativecord
     class Guild : ObjectBase
     {
         public:
-            NC_EXPORT Guild();
-            NC_EXPORT Guild(nativecord::Client* client);
-            NC_EXPORT Guild(nativecord::Client* client, snowflake id);
-            NC_EXPORT ~Guild();
+            NC_EXPORT Guild(Client* client, snowflake id);
+            ~Guild();
 
             NC_EXPORT std::shared_ptr<class Channel> getChannel(snowflake id);
             NC_EXPORT std::shared_ptr<struct GuildMember> getMember(snowflake id);
@@ -115,6 +115,15 @@ namespace nativecord
             std::optional<WelcomeScreen> welcome_screen;
 
             friend void from_json(const nlohmann::json& nlohmann_json_j, Guild& nlohmann_json_t);
+
+        protected:
+            friend class ClientBase;
+
+            Guild();
+            Guild(Client* client);
+
+            static std::shared_ptr<Guild> _createShared(Client*);
+
         private:
             void initCache();
             bool hasCache = false;

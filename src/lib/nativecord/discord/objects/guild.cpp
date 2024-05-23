@@ -15,6 +15,8 @@ Guild::Guild(Client* client, snowflake guildId) : ObjectBase(client)
     id = guildId;
 }
 
+std::shared_ptr<Guild> Guild::_createShared(Client* client) { return std::shared_ptr<Guild>(new Guild(client)); }
+
 Guild::~Guild()
 {
     if (!hasCache)
