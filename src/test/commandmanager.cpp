@@ -15,7 +15,6 @@ Command* CommandCategory::findCommand(std::string name)
     return nullptr;
 }
 
-
 Command* CommandManager::findCommand(std::string name)
 {
     for (auto cat : _categories)

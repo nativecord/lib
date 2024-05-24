@@ -59,8 +59,6 @@ namespace nativecord
             NC_EXPORT std::shared_ptr<class Channel> getChannel(snowflake id);
             NC_EXPORT std::shared_ptr<struct GuildMember> getMember(snowflake id);
 
-            NC_EXPORT auto getChannelCache() { return _channelCache; }
-
             snowflake id;
             std::string name;
             std::optional<std::string> icon;
@@ -123,6 +121,10 @@ namespace nativecord
             Guild(Client* client);
 
             static std::shared_ptr<Guild> _createShared(Client*);
+
+        protected:
+            friend inline void from_json(const nlohmann::json& nlohmann_json_j, Guild& nlohmann_json_t);
+            Cache<snowflake, Channel>* getChannelCache() { return _channelCache; }
 
         private:
             void initCache();

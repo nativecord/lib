@@ -11,7 +11,7 @@
 
 namespace nativecord
 {
-    enum messageFlags : int32_t
+    enum MessageFlags : int32_t
     {
         MESSAGEFLAG_CROSSPOSTED = 1 << 0,
         MESSAGEFLAG_IS_CROSSPOST = 1 << 1,
@@ -26,7 +26,7 @@ namespace nativecord
         MESSAGEFLAG_IS_VOICE_MESSAGE = 1 << 13
     };
 
-    enum messageTypes : int32_t
+    enum MessageTypes : int32_t
     {
         MESSAGE_DEFAULT = 0,                                       // deletable: true
         MESSAGE_RECIPIENT_ADD = 1,                                 // deletable: false
@@ -61,7 +61,7 @@ namespace nativecord
         MESSAGE_GUILD_APPLICATION_PREMIUM_SUBSCRIPTION = 32        // deletable: true
     };
 
-    enum messageInteractionType : int32_t
+    enum MessageInteractionType : int32_t
     {
         INTERACTION_PING = 1,
         INTERACTION_APPLICATION_COMMAND,
@@ -89,7 +89,7 @@ namespace nativecord
     struct MessageInteractionMetadata
     {
             uint64_t id;
-            messageInteractionType type;
+            MessageInteractionType type;
             User user;
             std::vector<int> authorizing_integration_owners;
             uint64_t original_response_message_id;
@@ -130,11 +130,11 @@ namespace nativecord
             std::vector<Embed> embeds;
             // std::optional<std::vector<Reaction>> reactions;
             std::optional<std::string> nonce;
-            std::optional<messageTypes> type; // always received, not sent
+            std::optional<MessageTypes> type; // always received, not sent
             // Application application;
             std::optional<snowflake> application_id;
             std::optional<MessageReference> message_reference;
-            std::optional<messageFlags> flags;
+            std::optional<MessageFlags> flags;
             std::optional<Message*> referenced_message;
             std::optional<MessageInteractionMetadata> interaction_metadata;
             // MessageInteraction interaction; // deprecated
