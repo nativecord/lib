@@ -43,8 +43,8 @@ else()
 endif()
 
 target_include_directories(nativecord-lib PUBLIC "src/lib")
-target_link_libraries(nativecord-lib PRIVATE nativecord-warnings nlohmann_json)
-target_link_libraries(nativecord-lib PUBLIC hv)
+target_link_libraries(nativecord-lib PRIVATE nativecord-warnings)
+target_link_libraries(nativecord-lib PUBLIC hv nlohmann_json)
 set_target_properties(nativecord-lib PROPERTIES USE_FOLDERS ON)
 
 # libhv copy
