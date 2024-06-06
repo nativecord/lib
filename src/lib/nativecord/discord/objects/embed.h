@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "nativecord/internal/serializers/embed.h"
+#include "serializers/embed_s.h"
 #include "nativecord/internal/objectbase.h"
 
 namespace nativecord

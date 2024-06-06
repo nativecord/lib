@@ -1,7 +1,7 @@
-#include "message.h"
-#include "channel.h"
-#include "embed.h"
-#include "user.h"
+#include "message_s.h"
+#include "channel_s.h"
+#include "embed_s.h"
+#include "user_s.h"
 
 #include "nativecord/discord/objects/message.h"
 

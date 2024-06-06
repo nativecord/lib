@@ -3,7 +3,7 @@
 #include "nativecord/discord/defs.h"
 
 #include "nativecord/internal/objectbase.h"
-#include "nativecord/internal/serializers/user.h"
+#include "serializers/user_s.h"
 
 #include <optional>
 

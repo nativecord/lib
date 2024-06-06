@@ -1,4 +1,4 @@
-#include "embed.h"
+#include "embed_s.h"
 
 #include "nativecord/discord/objects/embed.h"
 

@@ -7,7 +7,7 @@
 #include "nativecord/discord/defs.h"
 
 #include "nativecord/internal/objectbase.h"
-#include "nativecord/internal/serializers/message.h"
+#include "serializers/message_s.h"
 
 namespace nativecord
 {

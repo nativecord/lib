@@ -1,6 +1,6 @@
-#include "channel.h"
-#include "guild.h"
-#include "user.h"
+#include "channel_s.h"
+#include "guild_s.h"
+#include "user_s.h"
 
 #include "nativecord/discord/objects/channel.h"
 

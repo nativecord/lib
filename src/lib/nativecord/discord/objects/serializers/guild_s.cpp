@@ -1,5 +1,5 @@
-#include "guild.h"
-#include "channel.h"
+#include "guild_s.h"
+#include "channel_s.h"
 
 #include "nativecord/discord/objects/guild.h"
 #include "nativecord/discord/objects/channel.h"

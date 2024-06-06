@@ -1,4 +1,4 @@
-#include "user.h"
+#include "user_s.h"
 
 #include "nativecord/discord/objects/user.h"
 

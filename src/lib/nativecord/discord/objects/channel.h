@@ -1,7 +1,7 @@
 #pragma once
 
 #include "nativecord/internal/objectbase.h"
-#include "nativecord/internal/serializers/channel.h"
+#include "serializers/channel_s.h"
 
 #include "nativecord/discord/defs.h"
 #include "nativecord/discord/objects/guild.h"
