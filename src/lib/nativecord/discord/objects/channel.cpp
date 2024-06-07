@@ -15,8 +15,8 @@ std::shared_ptr<Channel> Channel::_createShared(Client* client)
 Channel::Channel(Client* client, snowflake channelId) : ObjectBase(client)
 {
     auto res = _getClientBase()->apiCall(std::format("channels/{}", channelId).c_str(), HTTP_GET);
-    nlohmann::json channelJs = nlohmann::json::parse(res.second);
-    channelJs.get_to(*this);
+    nlohmann::json channelJS = nlohmann::json::parse(res.second);
+    channelJS.get_to(*this);
 }
 
 void Channel::sendMessage(std::string content)
