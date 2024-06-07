@@ -3,6 +3,8 @@
 
 #include "nativecord/config.h"
 
+#include "nativecord/internal/clientbase.h"
+
 using namespace nativecord;
 
 Guild::Guild() {}
@@ -35,6 +37,26 @@ std::shared_ptr<GuildMember> Guild::getMember(snowflake memberId)
 {
     auto member = _memberCache->get(memberId);
     return nullptr;
+}
+
+NC_EXPORT void nativecord::Guild::populateChannels()
+{
+    auto res = _getClientBase()->apiCall(std::format("guilds/{}/channels", id).c_str(), HTTP_GET);
+
+    try
+    {
+        nlohmann::json channelsJS = nlohmann::json::parse(res.second);
+        for (auto channelJS : channelsJS)
+        {
+            auto channel = Channel::_createShared(_client);
+            channelJS.get_to(*channel);
+            _channelCache->insert(channel->id, channel);
+        }
+    }
+    catch (std::exception)
+    {
+        return;
+    }
 }
 
 void nativecord::Guild::initCache()

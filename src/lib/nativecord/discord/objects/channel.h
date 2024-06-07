@@ -116,6 +116,8 @@ namespace nativecord
 
         protected:
             friend NC_EXPORT void from_json(const nlohmann::json&, Guild&);
+            friend Guild;
+
             static std::shared_ptr<Channel> _createShared(Client* client);
 
             Channel(Client*);
