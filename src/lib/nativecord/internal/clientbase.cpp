@@ -74,8 +74,9 @@ void ClientBase::gatewayConnect()
     // token / intent validation
     if (_token.empty())
         throw new std::logic_error("token not set");
-    if (_intents == 0)
-        throw new std::logic_error("intents not set");
+    
+     if (_intents == 0 && _token.starts_with("Bot "))
+         throw new std::logic_error("intents not set");
 
     bool botPrefix = false;
     if (_token.compare(0, 4, "Bot ") == 0)
@@ -106,10 +107,12 @@ void ClientBase::gatewayHello(nlohmann::json& js)
     id["op"] = GATEWAY_IDENTIFY;
 
     nlohmann::json data({{"token", _token},
-                         {"intents", _intents},
                          {"compress", false},
                          {"large_treshold", 250},
                          {"properties", {{"os", "Windows"}, {"browser", "Chrome"}}}});
+    if (_intents != 0)
+        data["intents"] = _intents;
+
     id["d"] = data;
 
     gatewaySend(id);

@@ -49,7 +49,7 @@ namespace nativecord
             Cache<std::string, Channel>* _channelCache;
             Cache<std::string, User>* _userCache;
 
-            ClientIntents _intents;
+            ClientIntents _intents = 0;
             std::string _token;
             User _user;
             EventEmitter _ev;
