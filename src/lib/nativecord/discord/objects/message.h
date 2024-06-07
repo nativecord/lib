@@ -99,7 +99,7 @@ namespace nativecord
 
     struct StickerItem
     {
-            uint64_t id;
+            std::string id;
             std::string name;
             int format_type;
     };
