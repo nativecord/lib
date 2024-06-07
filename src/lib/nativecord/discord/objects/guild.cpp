@@ -15,6 +15,10 @@ Guild::Guild(Client* client, snowflake guildId) : ObjectBase(client)
 {
     initCache();
     id = guildId;
+
+     auto res = _getClientBase()->apiCall(std::format("guilds/{}", id).c_str(), HTTP_GET);
+    nlohmann::json guildJS = nlohmann::json::parse(res.second);
+     guildJS.get_to(*this);
 }
 
 std::shared_ptr<Guild> Guild::_createShared(Client* client) { return std::shared_ptr<Guild>(new Guild(client)); }
