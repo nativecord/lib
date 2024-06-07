@@ -100,6 +100,11 @@ template <typename KeyType, typename ValueType> class Cache
             return it->second->second;
         }
 
+        const std::vector<KeyValuePair> getContents() const
+        {
+            std::lock_guard<std::mutex> lock(_mutex);
+            return std::vector<KeyValuePair>(_data.begin(), _data.end());
+        }
     private:
         std::unordered_map<KeyType, typename std::list<KeyValuePair>::iterator> _indexes;
         std::list<KeyValuePair> _data;
