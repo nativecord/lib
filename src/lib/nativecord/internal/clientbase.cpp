@@ -121,8 +121,7 @@ void ClientBase::gatewaySend(nlohmann::json& js)
     _ws.send(jsStr);
 }
 
-std::pair<int, std::string> ClientBase::apiCall(const char* path, http_method method,
-                                                            nlohmann::json* payload)
+std::pair<int, std::string> ClientBase::apiCall(const char* path, http_method method, nlohmann::json* payload)
 {
     std::string url = std::string(DISCORD_API_URL) + path;
     std::unordered_map<std::string, std::string> headers;
@@ -159,7 +158,7 @@ void ClientBase::gatewayReceive(const std::string& data)
             }
         case GATEWAY_INVALID_SESSION:
             {
-                _ev.fireEvent("error", reinterpret_cast<Client*>(this), "Invalid session");
+                _ev.fireEvent("error", reinterpret_cast<Client*>(this), std::string("Invalid session"));
                 break;
             }
         case GATEWAY_HELLO:
